@@ -1,5 +1,4 @@
 import { CloudWatchLogsClient, PutLogEventsCommand, REGION, LOG_GROUP_NAME } from "./globals.mjs";
-import { processClearLog } from './clearlog.mjs'
 import { newUuidV4 } from './newuuid.mjs'
 
 export const processAddLog = async (userId, op, req, resp, httpCode) => {
@@ -15,7 +14,7 @@ export const processAddLog = async (userId, op, req, resp, httpCode) => {
             }
         ],
         "logGroupName": LOG_GROUP_NAME,
-        "logStreamName": "logs",
+        "logStreamName": "log",
         "sequenceToken": newUuidV4()
     };
     const command = new PutLogEventsCommand(params);

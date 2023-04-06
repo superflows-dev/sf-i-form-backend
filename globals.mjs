@@ -14,6 +14,8 @@ const AUTH_REGION = "AWS_AUTH_REGION";
 const AUTH_API = "AWS_AUTH_API";
 const AUTH_STAGE = "test";
 
+const ADMIN_METHODS = [BACKEND_ADMIN_METHODS];
+
 const SEARCH_ENDPOINT = "AWS_SEARCH_ENDPOINT";
 
 const PRESERVE_LOGS_DAYS = 3;
@@ -39,5 +41,6 @@ export {
     SEARCH_ENDPOINT,
     CloudWatchLogsClient,
     PutLogEventsCommand,
-    LOG_GROUP_NAME
+    LOG_GROUP_NAME,
+    ADMIN_METHODS
 };

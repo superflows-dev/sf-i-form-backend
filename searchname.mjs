@@ -13,6 +13,8 @@ export const processSearchName = async (searchString) => {
     
     const command = new SearchCommand(params);
     
+    //console.log('command', command)
+    
     var data;
     
     // async/await.
@@ -21,8 +23,9 @@ export const processSearchName = async (searchString) => {
       // process data.
     } catch (error) {
       // error handling.
+      console.log(error);
     } finally {
-      // finally.
+      // finally. 
     }
     
     return data;
