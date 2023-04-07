@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS } from "./globals.mjs";
 
 export const processUploadSearch = async (id, name, searchfields, values) => {
   
@@ -11,7 +11,7 @@ export const processUploadSearch = async (id, name, searchfields, values) => {
     
     for(var i = 0; i < searchfields.length; i++) {
       
-      data.push(values[searchfields[i]].text);
+      data.push(values[FIELDS[i]].text);
       
     }
     

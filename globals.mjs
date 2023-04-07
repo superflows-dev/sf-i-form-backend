@@ -16,6 +16,7 @@ const AUTH_STAGE = "test";
 
 const ADMIN_METHODS = BACKEND_ADMIN_METHODS;
 const FIELDS = INPUT_FIELDS;
+const SEARCH_INDEX = "S_INDEX";
 
 const SEARCH_ENDPOINT = "AWS_SEARCH_ENDPOINT";
 
@@ -43,5 +44,7 @@ export {
     CloudWatchLogsClient,
     PutLogEventsCommand,
     LOG_GROUP_NAME,
-    ADMIN_METHODS
+    ADMIN_METHODS,
+    SEARCH_INDEX,
+    FIELDS
 };

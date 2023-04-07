@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
@@ -49,13 +49,9 @@ export const processCreate = async (event) => {
     // a client can be shared by different commands.
     
     var values = null;
-    var searchindex = null;
-    var searchfields = null;
     
     try {
         values = JSON.parse(event.body).values;
-        searchindex = JSON.parse(event.body).searchindex.trim();
-        searchfields = JSON.parse(event.body).searchfields;
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
         processAddLog(userId, 'create', event, response, response.statusCode)
@@ -68,19 +64,8 @@ export const processCreate = async (event) => {
         return response;
     }
     
-    if(searchindex == null) {
-        const response = {statusCode: 400, body: {result: false, error: "Search index is not valid!"}}
-        processAddLog(userId, 'create', event, response, response.statusCode)
-        return response;
-    }
-
-    if(searchfields == null) {
-        const response = {statusCode: 400, body: {result: false, error: "Search fields are not valid!"}}
-        processAddLog(userId, 'create', event, response, response.statusCode)
-        return response;
-    }
     
-    const searchResult = await processSearchName(values[searchindex].value);
+    const searchResult = await processSearchName(values[SEARCH_INDEX].value);
     console.log('searchresult', searchResult.hits.found);
     
     if(searchResult.hits.found > 0) {
@@ -119,7 +104,7 @@ export const processCreate = async (event) => {
     
     const resultPut = await ddbPut();
     
-    await processUploadSearch(id, values[searchindex].value, searchfields, values)
+    await processUploadSearch(id, values[searchindex].value, values)
     
     const response = {statusCode: 200, body: {result: true}};
     processAddLog(userId, 'create', event, response, response.statusCode)
