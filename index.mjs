@@ -24,8 +24,7 @@ export const handler = async (event, context, callback) => {
         case "/create":
           const resultCreate = await processCreate(event);
           response.body = JSON.stringify(resultCreate.body);
-          //console.log('status code', processCreate.statusCode);
-          //response.statusCode = resultCreate.statusCode;
+          response.statusCode = resultCreate.statusCode;
         break;
         
         // case "/list":

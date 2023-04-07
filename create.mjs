@@ -104,7 +104,7 @@ export const processCreate = async (event) => {
     
     const resultPut = await ddbPut();
     
-    await processUploadSearch(id, values[searchindex].value, values)
+    await processUploadSearch(id, values[SEARCH_INDEX].value, values)
     
     const response = {statusCode: 200, body: {result: true}};
     processAddLog(userId, 'create', event, response, response.statusCode)
