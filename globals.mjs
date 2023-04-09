@@ -2,7 +2,7 @@ const REGION = "AWS_REGION"; //e.g. "us-east-1"
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { ScanCommand, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { CloudSearchDomainClient, UploadDocumentsCommand, SearchCommand } from "@aws-sdk/client-cloudsearch-domain";
-import { CloudWatchLogsClient, PutLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
+import { CloudWatchLogsClient, PutLogEventsCommand, GetLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
 
 const ddbClient = new DynamoDBClient({ region: REGION });
 
@@ -46,5 +46,6 @@ export {
     LOG_GROUP_NAME,
     ADMIN_METHODS,
     SEARCH_INDEX,
-    FIELDS
+    FIELDS,
+    GetLogEventsCommand
 };

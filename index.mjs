@@ -1,4 +1,9 @@
 import { processCreate } from './create.mjs';
+import { processDelete } from './delete.mjs';
+import { processList } from './list.mjs';
+import { processDetail } from './detail.mjs';
+import { processUpdate } from './update.mjs';
+import { processLogs } from './logs.mjs';
 
 export const handler = async (event, context, callback) => {
     
@@ -27,29 +32,35 @@ export const handler = async (event, context, callback) => {
           response.statusCode = resultCreate.statusCode;
         break;
         
-        // case "/list":
-        //   const resultList = await processList(event);
-        //   response.body = JSON.stringify(resultList.body);
-        //   response.statusCode = resultList.statusCode;
-        // break;
+        case "/list":
+          const resultList = await processList(event);
+          response.body = JSON.stringify(resultList.body);
+          response.statusCode = resultList.statusCode;
+        break;
         
-        // case "/detail":
-        //   const resultDetail = await processDetail(event);
-        //   response.body = JSON.stringify(resultDetail.body);
-        //   response.statusCode = resultDetail.statusCode;
-        // break;
+        case "/detail":
+          const resultDetail = await processDetail(event);
+          response.body = JSON.stringify(resultDetail.body);
+          response.statusCode = resultDetail.statusCode;
+        break;
         
-        // case "/update":
-        //   const resultUpdate = await processUpdate(event);
-        //   response.body = JSON.stringify(resultUpdate.body);
-        //   response.statusCode = resultUpdate.statusCode;
-        // break;
+        case "/update":
+          const resultUpdate = await processUpdate(event);
+          response.body = JSON.stringify(resultUpdate.body);
+          response.statusCode = resultUpdate.statusCode;
+        break;
         
-        // case "/delete":
-        //   const resultDelete = await processDelete(event);
-        //   response.body = JSON.stringify(resultDelete.body);
-        //   response.statusCode = resultDelete.statusCode;
-        // break;
+        case "/delete":
+          const resultDelete = await processDelete(event);
+          response.body = JSON.stringify(resultDelete.body);
+          response.statusCode = resultDelete.statusCode;
+        break;
+        
+        case "/logs":
+          const resultLogs = await processLogs(event);
+          response.body = JSON.stringify(resultLogs.body);
+          response.statusCode = resultLogs.statusCode;
+        break;
         
     }
     

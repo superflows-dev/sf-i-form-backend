@@ -1,12 +1,12 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
-import { processUploadSearch } from './uploadsearch.mjs';
+import { processDeleteSearch } from './deletesearch.mjs';
 
-export const processCreate = async (event) => {
-    
+export const processDelete = async (event) => {
+
     if((event["headers"]["Authorization"]) == null) {
         return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
     }
@@ -38,80 +38,77 @@ export const processCreate = async (event) => {
         return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
     }
     
-    if(ADMIN_METHODS.includes("create")) {
+    if(ADMIN_METHODS.includes("delete")) {
         if(!authResult.admin) {
             return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
         }   
     }
     
     const userId = authResult.userId;
-    
-    var values = null;
+
+    var id = null;
     
     try {
-        values = JSON.parse(event.body).values;
+        id = JSON.parse(event.body).id.trim();
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
-        processAddLog(userId, 'create', event, response, response.statusCode)
+        processAddLog(userId, 'delete', event, response, response.statusCode)
         return response;
     }
     
-    if(values == null) {
-        const response = {statusCode: 400, body: {result: false, error: "Values are not valid!"}}
-        processAddLog(userId, 'create', event, response, response.statusCode)
+    if(id == null || id == "" || id.length < 6) {
+        const response = {statusCode: 400, body: {result: false, error: "Id is not valid!"}}
+        processAddLog(userId, 'delete', event, response, response.statusCode)
         return response;
     }
     
-    for(var i = 0; i < Object.keys(values).length; i++) {
-        
-        if(!FIELDS.includes(Object.keys(values)[i])) {
-            
-            const response = {statusCode: 400, body: {result: false, error: "Values are not valid!"}}
-            processAddLog(userId, 'create', event, response, response.statusCode)
-            return response;
-            
-        }
-        
-    }
-    
-    const searchResult = await processSearchName(values[SEARCH_INDEX].value);
-    
-    if(searchResult.hits.found > 0) {
-    
-        const response = {statusCode: 409, body: {result: false, error: "Name already exists!"}}
-        processAddLog(userId, 'create', event, response, response.statusCode)
-        return response;
-    
-    }
-    
-    const id = newUuidV4();
-    
-    const item = {};
-    for(var i = 0; i < Object.keys(values).length; i++) {
-        item[Object.keys(values)[i]] = {"S": values[Object.keys(values)[i]].value};
-    }
-    item["id"] = {"S": id};
-    
-    var setParams = {
+    var getParams = {
         TableName: TABLE,
-        Item: item
+        Key: {
+          id: { S: id },
+        },
     };
     
-    const ddbPut = async () => {
+    async function ddbGet () {
         try {
-          const data = await ddbClient.send(new PutItemCommand(setParams));
+          const data = await ddbClient.send(new GetItemCommand(getParams));
           return data;
         } catch (err) {
           return err;
         }
     };
     
-    const resultPut = await ddbPut();
+    var resultGet = await ddbGet();
     
-    await processUploadSearch(id, values[SEARCH_INDEX].value, values)
+    await processDeleteSearch(id)
+    
+    if(resultGet.Item == null) {
+        const response = {statusCode: 404, body: {result: false, error: "Record does not exist!"}}
+        processAddLog(userId, 'delete', event, response, response.statusCode)
+        return response;
+    }
+    
+    var deleteParams = {
+        TableName: TABLE,
+        Key: {
+            id: { S: id },
+        }
+    };
+    
+    const ddbDelete = async () => {
+        try {
+            const data = await ddbClient.send(new DeleteItemCommand(deleteParams));
+            return data;
+        } catch (err) {
+            console.log(err)
+            return err;
+        }
+    };
+    
+    var resultDelete = await ddbDelete();
     
     const response = {statusCode: 200, body: {result: true}};
-    processAddLog(userId, 'create', event, response, response.statusCode)
+    processAddLog(userId, 'delete', event, response, response.statusCode)
     return response;
 
 }

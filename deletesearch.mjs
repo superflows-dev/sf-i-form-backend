@@ -1,35 +1,17 @@
 import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS } from "./globals.mjs";
 
-export const processUploadSearch = async (id, name, values) => {
+export const processDeleteSearch = async (id) => {
   
     const client = new CloudSearchDomainClient({  
         endpoint: SEARCH_ENDPOINT,
         region: REGION
     });
     
-    var data = [];
-    
-    console.log(FIELDS, values);
-    
-    for(var i = 0; i < FIELDS.length; i++) {
-      
-      if(values[FIELDS[i]].text != null) {
-      
-        data.push(values[FIELDS[i]].text);
-        
-      } else {
-        
-        data.push(values[FIELDS[i]].value);
-      
-      }
-      
-    }
     
     const input = { 
       documents: JSON.stringify([{
-        "type": "add",
-        "id": id,
-        "fields": {"name": name, "data": JSON.stringify(data)}
+        "type": "delete",
+        "id": id
       }]),
       contentType: "application/json",
     };
