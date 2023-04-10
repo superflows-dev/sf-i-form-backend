@@ -3,7 +3,7 @@ import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUT
 export const processDeleteSearch = async (id) => {
   
     const client = new CloudSearchDomainClient({  
-        endpoint: SEARCH_ENDPOINT,
+        endpoint: SEARCH_ENDPOINT.replace('search-', 'doc-'),
         region: REGION
     });
     
