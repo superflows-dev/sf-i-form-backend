@@ -155,7 +155,6 @@ export const processUpdate = async (event) => {
   
     var resultUpdate = await ddbUpdate();
     
-    await processDeleteSearch(id)
     await processUploadSearch(id, values[SEARCH_INDEX].value, values)
     
     const response = {statusCode: 200, body: {result: true}};
