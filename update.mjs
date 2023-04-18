@@ -130,7 +130,7 @@ export const processUpdate = async (event) => {
     
     for(var i = 0; i < Object.keys(values).length; i++) {
         
-        exprValues[':' + Object.keys(values)[i] + "1"] = {S: values[Object.keys(values)[i]].value};
+        exprValues[':' + Object.keys(values)[i] + "1"] = {S: JSON.stringify(values[Object.keys(values)[i]].value)};
         
     }
     

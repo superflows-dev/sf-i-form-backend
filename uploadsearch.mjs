@@ -25,14 +25,18 @@ export const processUploadSearch = async (id, name, values) => {
       
     }
     
+    const nameUpload = Array.isArray(name) ? name[0] : name;
+    
     const input = { 
       documents: JSON.stringify([{
         "type": "add",
         "id": id,
-        "fields": {"name": name, "data": JSON.stringify(data)}
+        "fields": {"name": nameUpload, "data": JSON.stringify(data)}
       }]),
       contentType: "application/json",
     };
+    
+    console.log(input);
     
     const command = new UploadDocumentsCommand(input);
     

@@ -88,7 +88,7 @@ export const processCreate = async (event) => {
     
     const item = {};
     for(var i = 0; i < Object.keys(values).length; i++) {
-        item[Object.keys(values)[i]] = {"S": values[Object.keys(values)[i]].value};
+        item[Object.keys(values)[i]] = {"S": JSON.stringify(values[Object.keys(values)[i]].value)};
     }
     item["id"] = {"S": id};
     
