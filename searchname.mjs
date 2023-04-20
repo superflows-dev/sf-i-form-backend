@@ -7,8 +7,23 @@ export const processSearchName = async (searchString) => {
         region: REGION
     });
     
+    var query = "";
+    
+    query += "(and '"+TABLE+"' ";
+    
+    const arrSearch = searchString.split("|");
+    
+    for(var i = 0; i < arrSearch.length; i++) {
+      if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
+        query += "(prefix '"+arrSearch[i]+"') "
+      }
+    }
+    
+    query += ")";
+    
     const params = {
-      query: searchString
+      query: query,
+      queryParser: "structured"
     };
     
     const command = new SearchCommand(params);
