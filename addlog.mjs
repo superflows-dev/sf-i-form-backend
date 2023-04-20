@@ -1,7 +1,7 @@
 import { CloudWatchLogsClient, PutLogEventsCommand, REGION, LOG_GROUP_NAME } from "./globals.mjs";
 import { newUuidV4 } from './newuuid.mjs'
 
-export const processAddLog = async (userId, op, req, resp, httpCode) => {
+export const processAddLog = async (userId, op, req, resp, httpCode, delta = null) => {
     
     // a client can be shared by different commands.
     const client = new CloudWatchLogsClient({ region: REGION });
@@ -9,7 +9,7 @@ export const processAddLog = async (userId, op, req, resp, httpCode) => {
     const params = {
        "logEvents": [ 
             { 
-             "message": JSON.stringify({userId: userId, op: op, req: req, resp: resp, httpCode: httpCode}),
+             "message": JSON.stringify({userId: userId, op: op, req: req, resp: resp, httpCode: httpCode, delta: delta}),
              "timestamp": new Date().getTime()
             }
         ],

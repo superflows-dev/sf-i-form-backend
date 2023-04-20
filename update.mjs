@@ -155,10 +155,22 @@ export const processUpdate = async (event) => {
   
     var resultUpdate = await ddbUpdate();
     
+    var delta = [];
+    
+    for(i = 0; i < Object.keys(values).length; i++) {
+        
+        if(values[Object.keys(values)[i]] != "id") {
+            
+            delta.push(Object.keys(values)[i] + ":" + (resultGet.Item[Object.keys(values)[i]]["S"]) + ":" + JSON.stringify(values[Object.keys(values)[i]].value))
+            
+        }
+        
+    }
+    
     await processUploadSearch(id, values[SEARCH_INDEX].value, values)
     
     const response = {statusCode: 200, body: {result: true}};
-    processAddLog(userId, 'update', event, response, response.statusCode)
+    processAddLog(userId, 'update', event, response, response.statusCode, delta)
     return response;
 
 }
