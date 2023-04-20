@@ -17,7 +17,7 @@ export const processSearchName = async (searchString) => {
     
     for(var i = 0; i < arrSearch.length; i++) {
       if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-        query += "(prefix '"+arrSearch[i]+"') "
+        query += "(or (prefix field=data '"+arrSearch[i]+"') (phrase field=data '"+arrSearch[i]+"')) "
       }
     }
     
@@ -27,6 +27,8 @@ export const processSearchName = async (searchString) => {
       query: query,
       queryParser: "structured"
     };
+    
+    console.log(params);
     
     const command = new SearchCommand(params);
     
