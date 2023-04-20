@@ -7,15 +7,17 @@ export const processSearchName = async (searchString) => {
         region: REGION
     });
     
+    console.log('searchString', searchString);
+    
     var query = "";
     
     query += "(and '"+TABLE+"' ";
     
-    const arrSearch = searchString.split("|");
+    const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("|");
     
     for(var i = 0; i < arrSearch.length; i++) {
       if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-        query += "(or (prefix field=data '"+arrSearch[i]+"') (phrase field=data '"+arrSearch[i]+"')) "
+        query += "(prefix '"+arrSearch[i]+"') "
       }
     }
     
@@ -25,8 +27,6 @@ export const processSearchName = async (searchString) => {
       query: query,
       queryParser: "structured"
     };
-    
-    console.log('query', params);
     
     const command = new SearchCommand(params);
     
