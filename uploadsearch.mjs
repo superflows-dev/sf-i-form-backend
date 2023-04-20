@@ -34,7 +34,7 @@ export const processUploadSearch = async (id, name, values) => {
       documents: JSON.stringify([{
         "type": "add",
         "id": id,
-        "fields": {"name": TABLE, "data": JSON.stringify(data), "cols": cols}
+        "fields": {"name": TABLE, "data": JSON.stringify(data), "cols": JSON.stringify(cols)}
       }]),
       contentType: "application/json",
     };
