@@ -8,6 +8,7 @@ export const processUploadSearch = async (id, name, values) => {
     });
     
     var data = [];
+    var cols = [];
     
     console.log(FIELDS, values);
     
@@ -23,6 +24,8 @@ export const processUploadSearch = async (id, name, values) => {
       
       }
       
+      cols.push(FIELDS[i]);
+      
     }
     
     const nameUpload = Array.isArray(name) ? name[0] : name;
@@ -31,7 +34,7 @@ export const processUploadSearch = async (id, name, values) => {
       documents: JSON.stringify([{
         "type": "add",
         "id": id,
-        "fields": {"name": nameUpload, "data": JSON.stringify(data)}
+        "fields": {"name": TABLE, "data": JSON.stringify(data), "cols": cols}
       }]),
       contentType: "application/json",
     };
