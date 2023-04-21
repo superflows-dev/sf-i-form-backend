@@ -11,17 +11,26 @@ export const processSearchName = async (searchString) => {
     
     var query = "";
     
-    query += "(and '"+TABLE+"' ";
+    if(searchString == "") {
+      
+      query += "(and '"+TABLE+"' ";
+      query += ")";
+      
+    } else {
     
-    const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("|");
-    
-    for(var i = 0; i < arrSearch.length; i++) {
-      if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-        query += "(or (prefix field=data '"+arrSearch[i]+"') (phrase field=data '"+arrSearch[i]+"')) "
+      query += "(and '"+TABLE+"' ";
+      
+      const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("|");
+      
+      for(var i = 0; i < arrSearch.length; i++) {
+        if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
+          query += "(or (prefix field=data '"+arrSearch[i]+"') (phrase field=data '"+arrSearch[i]+"')) "
+        }
       }
+      
+      query += ")";
+        
     }
-    
-    query += ")";
     
     const params = {
       query: query,

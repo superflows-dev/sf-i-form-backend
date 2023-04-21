@@ -57,7 +57,7 @@ export const processList = async (event) => {
     }
     
     if(searchstring == null || searchstring == "" || searchstring.length < 0) {
-        searchstring = "dog|-dog"
+        searchstring = ""
     }
     
     const searchResult = await processSearchName(searchstring);
