@@ -74,7 +74,9 @@ export const processCreate = async (event) => {
         
     }
     
-    const searchResult = await processSearchName(values[SEARCH_INDEX].value);
+    const valToBeSearched = values[SEARCH_INDEX].text != null ? (Array.isArray(values[SEARCH_INDEX].text) ? values[SEARCH_INDEX].text[0] : values[SEARCH_INDEX].text) : (Array.isArray(values[SEARCH_INDEX].value) ? values[SEARCH_INDEX].value[0] : values[SEARCH_INDEX].value);
+    
+    const searchResult = await processSearchName(valToBeSearched);
     
     if(searchResult.hits.found > 0) {
     
