@@ -80,7 +80,7 @@ export const processCreate = async (event) => {
     
     if(searchResult.hits.found > 0) {
     
-        const response = {statusCode: 409, body: {result: false, error: "Name already exists!"}}
+        const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
         processAddLog(userId, 'create', event, response, response.statusCode)
         return response;
     
