@@ -20,7 +20,7 @@ export const processSearchName = async (searchString) => {
     
       query += "(and '"+TABLE+"' ";
       
-      const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("|");
+      const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("&");
       
       for(var i = 0; i < arrSearch.length; i++) {
         if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
