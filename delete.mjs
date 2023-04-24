@@ -2,8 +2,9 @@ import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUT
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
-import { processSearchName } from './searchname.mjs';
+import { processSearchAllName } from './searchallname.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
+
 
 export const processDelete = async (event) => {
 
@@ -80,13 +81,27 @@ export const processDelete = async (event) => {
     
     var resultGet = await ddbGet();
     
-    await processDeleteSearch(id)
-    
     if(resultGet.Item == null) {
         const response = {statusCode: 404, body: {result: false, error: "Record does not exist!"}}
         processAddLog(userId, 'delete', event, response, response.statusCode)
         return response;
     }
+
+    if(SEARCH_ENDPOINT.length > 0) {
+
+        const searchResult = await processSearchAllName(resultGet.Item.name);
+        
+        if(searchResult.hits.found > 0) {
+        
+            const response = {statusCode: 409, body: {result: false, error: "Can't delete because this item is used elsewhere. Found " + searchResult.hits.found + " uses. "}}
+            processAddLog(userId, 'delete', event, response, response.statusCode)
+            return response;
+        
+        }
+
+    }
+
+    await processDeleteSearch(id);
     
     var deleteParams = {
         TableName: TABLE,
