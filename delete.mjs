@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX } from "./globals.mjs";
+import { DELETE_SEARCH_THRESHOLD, SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
@@ -91,7 +91,7 @@ export const processDelete = async (event) => {
 
         const searchResult = await processSearchAllName(resultGet.Item[SEARCH_INDEX]);
         
-        if(searchResult.hits.found > 0) {
+        if(searchResult.hits.found > DELETE_SEARCH_THRESHOLD) {
         
             const response = {statusCode: 409, body: {result: false, error: "Can't delete because this item is used elsewhere. Found " + searchResult.hits.found + " uses. "}}
             processAddLog(userId, 'delete', event, response, response.statusCode)
