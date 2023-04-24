@@ -91,7 +91,7 @@ export const processDelete = async (event) => {
 
         const searchResult = await processSearchAllName(resultGet.Item[SEARCH_INDEX]);
         
-        if(searchResult.hits.found > DELETE_SEARCH_THRESHOLD) {
+        if(searchResult.hits.found > parseInt(DELETE_SEARCH_THRESHOLD)) {
         
             const response = {statusCode: 409, body: {result: false, error: "Can't delete because this item is used elsewhere. Found " + searchResult.hits.found + " uses. "}}
             processAddLog(userId, 'delete', event, response, response.statusCode)
