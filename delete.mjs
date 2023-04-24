@@ -89,7 +89,7 @@ export const processDelete = async (event) => {
 
     if(SEARCH_ENDPOINT.length > 1) {
 
-        const searchResult = await processSearchAllName(resultGet.Item.name);
+        const searchResult = await processSearchAllName(resultGet.Item[SEARCH_INDEX]);
         
         if(searchResult.hits.found > 0) {
         
