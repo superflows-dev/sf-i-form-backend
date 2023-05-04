@@ -69,7 +69,7 @@ export const processList = async (event) => {
     
     const searchResult = await processSearchName(searchstring, cursor);
     
-    const response = {statusCode: 200, body: {result: true, values: searchResult.hits.hit}};
+    const response = {statusCode: 200, body: {result: true, values: searchResult.hits.hit, cursor: searchResult.hits.cursor, found: searchResult.hits.found}};
     //processAddLog(userId, 'list', event, response, response.statusCode)
     return response;
 
