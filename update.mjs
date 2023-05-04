@@ -106,6 +106,17 @@ export const processUpdate = async (event) => {
         processAddLog(userId, 'update', event, response, response.statusCode)
         return response;
     }
+
+    var shortId = "";
+    if(resultGet.Item["shortid"] == null) {
+        shortId = (new Date()).getTime().toString(36);
+    } else {
+        shortId = JSON.parse(resultGet.Item["shortid"].S)[0];
+    }
+    
+    values["shortid"] = {};
+    values["shortid"]["type"] = 'sf-i-input';
+    values["shortid"]["value"] = [shortId];
     
     var exprSet = "set ";
     
@@ -161,7 +172,8 @@ export const processUpdate = async (event) => {
         
         if(values[Object.keys(values)[i]] != "id") {
             
-            delta.push(Object.keys(values)[i] + ":" + (resultGet.Item[Object.keys(values)[i]]["S"]) + ":" + JSON.stringify(values[Object.keys(values)[i]].value))
+            const oldKey = (resultGet.Item[Object.keys(values)[i]] != null) ? (resultGet.Item[Object.keys(values)[i]]["S"]) : "";
+            delta.push(Object.keys(values)[i] + ":" + oldKey + ":" + JSON.stringify(values[Object.keys(values)[i]].value))
             
         }
         

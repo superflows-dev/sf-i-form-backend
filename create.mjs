@@ -87,6 +87,12 @@ export const processCreate = async (event) => {
     }
     
     const id = newUuidV4();
+
+    var shortId = "";
+    shortId = (new Date()).getTime().toString(36);
+    values["shortid"] = {};
+    values["shortid"]["type"] = 'sf-i-input';
+    values["shortid"]["value"] = [shortId];
     
     const item = {};
     for(var i = 0; i < Object.keys(values).length; i++) {

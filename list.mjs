@@ -47,9 +47,11 @@ export const processList = async (event) => {
     const userId = authResult.userId;
 
     var searchstring = null;
+    var cursor = null;
     
     try {
         searchstring = JSON.parse(event.body).searchstring.trim();
+        cursor = JSON.parse(event.body).cursor.trim();
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
         //processAddLog(userId, 'list', event, response, response.statusCode)
@@ -60,7 +62,12 @@ export const processList = async (event) => {
         searchstring = ""
     }
     
-    const searchResult = await processSearchName(searchstring);
+    
+    if(cursor == null || cursor == "" || cursor.length < 0) {
+        cursor = "initial"
+    }
+    
+    const searchResult = await processSearchName(searchstring, cursor);
     
     const response = {statusCode: 200, body: {result: true, values: searchResult.hits.hit}};
     //processAddLog(userId, 'list', event, response, response.statusCode)

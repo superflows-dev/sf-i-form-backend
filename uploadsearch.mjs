@@ -10,21 +10,22 @@ export const processUploadSearch = async (id, name, values) => {
     var data = [];
     var cols = [];
     
-    console.log(FIELDS, values);
+    const MODFIELDS = JSON.parse(JSON.stringify(FIELDS));
+    MODFIELDS.push("shortid");
     
-    for(var i = 0; i < FIELDS.length; i++) {
+    for(var i = 0; i < MODFIELDS.length; i++) {
       
-      if(values[FIELDS[i]].text != null) {
+      if(values[MODFIELDS[i]].text != null) {
       
-        data.push(values[FIELDS[i]].text);
+        data.push(values[MODFIELDS[i]].text);
         
       } else {
         
-        data.push(values[FIELDS[i]].value);
+        data.push(values[MODFIELDS[i]].value);
       
       }
       
-      cols.push(FIELDS[i]);
+      cols.push(MODFIELDS[i]);
       
     }
     

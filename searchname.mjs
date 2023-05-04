@@ -1,6 +1,6 @@
 import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand } from "./globals.mjs";
 
-export const processSearchName = async (searchString) => {
+export const processSearchName = async (searchString, cursor) => {
   
   const client = new CloudSearchDomainClient({ 
         endpoint: SEARCH_ENDPOINT,
@@ -34,7 +34,9 @@ export const processSearchName = async (searchString) => {
     
     const params = {
       query: query,
-      queryParser: "structured"
+      queryParser: "structured",
+      cursor: cursor,
+      size: 10
     };
     
     console.log(params);
@@ -48,6 +50,7 @@ export const processSearchName = async (searchString) => {
     // async/await.
     try {
       data = await client.send(command);
+      console.log('data', data);
       // process data.
     } catch (error) {
       // error handling.
