@@ -80,7 +80,7 @@ export const processCreate = async (event) => {
     
     const searchResult = await processSearchName(valToBeSearched);
     
-    if(ALLOW_DUPLICATE) {
+    if(ALLOW_DUPLICATE === 0) {
 
         if(searchResult.hits.found > 0) {
         
