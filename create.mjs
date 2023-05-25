@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS } from "./globals.mjs";
+import { ALLOW_DUPLICATE, SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
@@ -78,12 +78,16 @@ export const processCreate = async (event) => {
     
     const searchResult = await processSearchName(valToBeSearched);
     
-    if(searchResult.hits.found > 0) {
-    
-        const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
-        processAddLog(userId, 'create', event, response, response.statusCode)
-        return response;
-    
+    if(ALLOW_DUPLICATE) {
+
+        if(searchResult.hits.found > 0) {
+        
+            const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
+            processAddLog(userId, 'create', event, response, response.statusCode)
+            return response;
+        
+        }
+
     }
     
     const id = newUuidV4();
