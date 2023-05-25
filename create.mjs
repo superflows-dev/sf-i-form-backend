@@ -84,9 +84,28 @@ export const processCreate = async (event) => {
 
         if(searchResult.hits.found > 0) {
         
-            const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
-            processAddLog(userId, 'create', event, response, response.statusCode)
-            return response;
+            const resultQ = await ddbQuery();
+  
+            var unmarshalledItems = [];
+          
+            for(var i = 0; i < resultItems.length; i++) {
+                var itemResult = {};
+                for(var j = 0; j < Object.keys(resultItems[i]).length; j++) {
+                    itemResult[Object.keys(resultItems[i])[j]] = resultItems[i][Object.keys(resultItems[i])[j]][Object.keys(resultItems[i][Object.keys(resultItems[i])[j]])[0]];
+                }
+                unmarshalledItems.push(itemResult);
+            }
+            
+            for(i = 0; i < unmarshalledItems.length; i++) {
+                
+                if(unmarshalledItems[i][SEARCH_INDEX] == values[SEARCH_INDEX].value) {
+                    const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
+                    processAddLog(userId, 'create', event, response, response.statusCode)
+                    return response;        
+                }
+                
+            }
+            
         
         }
 
