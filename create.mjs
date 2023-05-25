@@ -79,6 +79,26 @@ export const processCreate = async (event) => {
     const valToBeSearched = values[SEARCH_INDEX].text != null ? (Array.isArray(values[SEARCH_INDEX].text) ? values[SEARCH_INDEX].text[0] : values[SEARCH_INDEX].text) : (Array.isArray(values[SEARCH_INDEX].value) ? values[SEARCH_INDEX].value[0] : values[SEARCH_INDEX].value);
     
     const searchResult = await processSearchName(valToBeSearched);
+
+    var scanParams = {
+        TableName: TABLE,
+    }
+    
+    var resultItems = []
+  
+    async function ddbQuery () {
+        try {
+            const data = await ddbClient.send (new ScanCommand(scanParams));
+            resultItems = resultItems.concat((data.Items))
+            if(data.LastEvaluatedKey != null) {
+                scanParams.ExclusiveStartKey = data.LastEvaluatedKey;
+                await ddbQuery();
+            }
+        } catch (err) {
+            console.log(err);
+            return err;
+        }
+    };
     
     if(ALLOW_DUPLICATE === 0) {
 
