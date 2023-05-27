@@ -118,7 +118,8 @@ export const processCreate = async (event) => {
             
             for(i = 0; i < unmarshalledItems.length; i++) {
                 
-                if(unmarshalledItems[i][SEARCH_INDEX] == values[SEARCH_INDEX].value) {
+                console.log('comparing', unmarshalledItems[i][SEARCH_INDEX], valToBeSearched);
+                if(unmarshalledItems[i][SEARCH_INDEX].replace(/"/g, "") == (Array.isArray(values[SEARCH_INDEX].value) ? values[SEARCH_INDEX]["value"][0] : values[SEARCH_INDEX]["value"])) {
                     const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
                     processAddLog(userId, 'create', event, response, response.statusCode)
                     return response;        
