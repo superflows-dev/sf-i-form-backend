@@ -11,30 +11,51 @@ export const processSearchName = async (searchString, cursor) => {
     
     var query = "";
     
+    // if(searchString == "") {
+      
+    //   query += "(and '"+TABLE+"' ";
+    //   query += ")";
+      
+    // } else {
+    
+    //   query += "(and '"+TABLE+"' ";
+      
+    //   const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("&");
+      
+    //   for(var i = 0; i < arrSearch.length; i++) {
+    //     if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
+    //       query += "(or (prefix field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"') (phrase field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"')) "
+    //     }
+    //   }
+      
+    //   query += ")";
+        
+    // }
+    
     if(searchString == "") {
       
-      query += "(and '"+TABLE+"' ";
-      query += ")";
+      query += TABLE;
       
     } else {
     
-      query += "(and '"+TABLE+"' ";
+      query += TABLE + " ";
       
       const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("&");
       
       for(var i = 0; i < arrSearch.length; i++) {
         if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-          query += "(or (prefix field=data '"+arrSearch[i]+"') (phrase field=data '"+arrSearch[i]+"')) "
+          query += arrSearch[i] + " ";
+          //query += "(or (prefix field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"') (phrase field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"')) "
         }
       }
       
-      query += ")";
+      //query += ")";
         
     }
     
     const params = {
       query: query,
-      queryParser: "structured",
+      queryParser: "simple",
       cursor: cursor,
       size: 10
     };

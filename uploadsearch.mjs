@@ -28,6 +28,12 @@ export const processUploadSearch = async (id, name, values) => {
       cols.push(MODFIELDS[i]);
       
     }
+
+    for(var i = 0; i < MODFIELDS.length; i++) {
+      
+      data.push(values[MODFIELDS[i]].value);
+      
+    }
     
     const nameUpload = Array.isArray(name) ? name[0] : name;
     
