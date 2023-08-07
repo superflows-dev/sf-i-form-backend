@@ -17,6 +17,7 @@ const AUTH_STAGE = "test";
 const ADMIN_METHODS = BACKEND_ADMIN_METHODS;
 const FIELDS = INPUT_FIELDS;
 const SEARCH_INDEX = "S_INDEX";
+const SERVER_KEY = "S_KEY";
 
 const DELETE_SEARCH_THRESHOLD = "DELETE_THRESHOLD";
 
@@ -41,6 +42,7 @@ export {
     AUTH_API, 
     AUTH_STAGE,
     PRESERVE_LOGS_DAYS,
+    SERVER_KEY,
     CloudSearchDomainClient,
     UploadDocumentsCommand,
     SearchCommand,
