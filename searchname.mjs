@@ -38,13 +38,13 @@ export const processSearchName = async (searchString, cursor) => {
       
     } else {
     
-      query += TABLE + " ";
+      query += TABLE + "&";
       
       const arrSearch = Array.isArray(searchString) ? searchString : searchString.split("&");
       
       for(var i = 0; i < arrSearch.length; i++) {
         if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-          query += arrSearch[i] + " ";
+          query += '(' + arrSearch[i] + ")&";
           //query += "(or (prefix field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"') (phrase field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"')) "
         }
       }
