@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, SERVER_KEY } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
@@ -7,42 +7,55 @@ import { processDeleteSearch } from './deletesearch.mjs';
 
 export const processDetail = async (event) => {
 
-    // if((event["headers"]["Authorization"]) == null) {
-    //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
-    // }
-    
-    // if((event["headers"]["Authorization"].split(" ")[1]) == null) {
-    //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
-    // }
-    
-    // var hAscii = Buffer.from((event["headers"]["Authorization"].split(" ")[1] + ""), 'base64').toString('ascii');
-    
-    // if(hAscii.split(":")[1] == null) {
-    //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
-    // }
-    
-    // const email = hAscii.split(":")[0];
-    // const accessToken = hAscii.split(":")[1];
-    
-    // if(email == "" || !email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) {
-    //     return {statusCode: 400, body: {result: false, error: "Malformed headers!"}}
-    // }
-    
-    // if(accessToken.length < 5) {
-    //     return {statusCode: 400, body: {result: false, error: "Malformed headers!"}}
-    // }
-    
-    // const authResult = await processAuthenticate(event["headers"]["Authorization"]);
-    
-    // if(!authResult.result) {
-    //     return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
-    // }
-    
-    // if(ADMIN_METHODS.includes("detail")) {
-    //     if(!authResult.admin) {
-    //         return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
-    //     }   
-    // }
+    var serverkey = "";
+
+    if(event["headers"]["x-server-key"] != null) {
+        serverkey = event["headers"]["x-server-key"];
+
+        if(serverkey != SERVER_KEY) {
+            return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
+        }
+
+    } else {
+
+        // if((event["headers"]["Authorization"]) == null) {
+        //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
+        // }
+        
+        // if((event["headers"]["Authorization"].split(" ")[1]) == null) {
+        //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
+        // }
+        
+        // var hAscii = Buffer.from((event["headers"]["Authorization"].split(" ")[1] + ""), 'base64').toString('ascii');
+        
+        // if(hAscii.split(":")[1] == null) {
+        //     return {statusCode: 400, body: { result: false, error: "Malformed headers!"}};
+        // }
+        
+        // const email = hAscii.split(":")[0];
+        // const accessToken = hAscii.split(":")[1];
+        
+        // if(email == "" || !email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) {
+        //     return {statusCode: 400, body: {result: false, error: "Malformed headers!"}}
+        // }
+        
+        // if(accessToken.length < 5) {
+        //     return {statusCode: 400, body: {result: false, error: "Malformed headers!"}}
+        // }
+        
+        // const authResult = await processAuthenticate(event["headers"]["Authorization"]);
+        
+        // if(!authResult.result) {
+        //     return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
+        // }
+        
+        // if(ADMIN_METHODS.includes("detail")) {
+        //     if(!authResult.admin) {
+        //         return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
+        //     }   
+        // }
+
+    }
     
     // const userId = authResult.userId;
 
