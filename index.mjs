@@ -3,6 +3,8 @@ import { processDelete } from './delete.mjs';
 import { processList } from './list.mjs';
 import { processDetail } from './detail.mjs';
 import { processUpdate } from './update.mjs';
+import { processUpdateField } from './updatefield.mjs';
+import { processScanByField } from './scanbyfield.mjs';
 import { processLogs } from './logs.mjs';
 
 export const handler = async (event, context, callback) => {
@@ -48,6 +50,18 @@ export const handler = async (event, context, callback) => {
           const resultUpdate = await processUpdate(event);
           response.body = JSON.stringify(resultUpdate.body);
           response.statusCode = resultUpdate.statusCode;
+        break;
+        
+        case "/updatefield":
+          const resultUpdateField = await processUpdateField(event);
+          response.body = JSON.stringify(resultUpdateField.body);
+          response.statusCode = resultUpdateField.statusCode;
+        break;
+        
+        case "/scanbyfield":
+          const resultScanByField = await processScanByField(event);
+          response.body = JSON.stringify(resultScanByField.body);
+          response.statusCode = resultScanByField.statusCode;
         break;
         
         case "/delete":
