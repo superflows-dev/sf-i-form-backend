@@ -51,12 +51,6 @@ export const processScanByField = async (event) => {
             return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
         }
         
-        if(ADMIN_METHODS.includes("scanbyfield")) {
-            if(!authResult.admin) {
-                return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
-            }   
-        }
-
         userId = authResult.userId;
 
     }
