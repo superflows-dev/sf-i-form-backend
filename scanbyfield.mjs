@@ -65,7 +65,7 @@ export const processScanByField = async (event) => {
     }
 
     // userId = "1234";
-
+    
     var field = null;
     var value = null;
     
@@ -94,7 +94,7 @@ export const processScanByField = async (event) => {
     exprNames["#"+field+"1"] = field;
     
     var exprValues = {};
-    exprValues[":"+field+"1"] = {S: value};
+    exprValues[":"+field+"1"] = {S: field == "id" ? value : '"' + value + '"'};
     
     var scanParams = {
         FilterExpression: "#"+field+"1 = :"+field+"1",
@@ -118,7 +118,7 @@ export const processScanByField = async (event) => {
                 arrRecords.push(data.Items[m])
             }
             if(data.LastEvaluatedKey != null) {
-                await ddbScanRecords(queryParams, data.ExclusiveStartKey);
+                await ddbScanRecords(queryParams, data.LastEvaluatedKey);
             }
             return;
         } catch (err) {
