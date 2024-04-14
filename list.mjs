@@ -10,13 +10,22 @@ export const processList = async (event) => {
     var serverkey = "";
     var userId = "1234"
 
-    if(event["headers"]["x-server-key"] != null) {
-        serverkey = event["headers"]["x-server-key"];
-
-        if(serverkey != SERVER_KEY) {
-            return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
-        }
-
+    if((event["headers"]["x-server-key"]) != null) {
+        
+        if((event["headers"]["x-server-key"]) != SERVER_KEY) {
+            
+            return {statusCode: 401, body: {result: false, error: "Unauthorized request!", headers: event["headers"]["x-server-key"], key: SERVER_KEY}}; 
+        
+        } 
+        
+    } else if ((event["headers"]["X-Server-Key"]) != null) {
+        
+        if((event["headers"]["X-Server-Key"]) != SERVER_KEY) {
+            
+            return {statusCode: 401, body: {result: false, error: "Unauthorized request!", headers: event["headers"]["X-Server-Key"], key: SERVER_KEY}}; 
+        
+        } 
+        
     } else {
 
         if((event["headers"]["Authorization"]) == null) {
