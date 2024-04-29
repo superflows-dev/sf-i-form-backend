@@ -12,9 +12,12 @@ export const processUploadSearch = async (id, name, values) => {
     
     const MODFIELDS = JSON.parse(JSON.stringify(FIELDS));
     MODFIELDS.push("shortid");
+    MODFIELDS.push("shortnumid");
     
     for(var i = 0; i < MODFIELDS.length; i++) {
       
+      console.log(MODFIELDS[i]);
+    
       if(values[MODFIELDS[i]].text != null) {
       
         data.push(values[MODFIELDS[i]].text);
