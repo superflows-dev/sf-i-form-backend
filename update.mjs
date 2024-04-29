@@ -139,9 +139,20 @@ export const processUpdate = async (event) => {
         shortId = JSON.parse(resultGet.Item["shortid"].S)[0];
     }
     
-    values["shortid"] = {};
-    values["shortid"]["type"] = 'sf-i-input';
-    values["shortid"]["value"] = [shortId];
+    values["shortnumid"] = {};
+    values["shortnumid"]["type"] = 'sf-i-input';
+    values["shortnumid"]["value"] = [shortId];
+    
+    var shortNumId = "";
+    if(resultGet.Item["shortnumid"] == null) {
+        shortNumId = parseInt((new Date()).getTime()/1000);
+    } else {
+        shortNumId = JSON.parse(resultGet.Item["shortnumid"].S)[0];
+    }
+    
+    values["shortnumid"] = {};
+    values["shortnumid"]["type"] = 'sf-i-input';
+    values["shortnumid"]["value"] = [shortNumId];
     
     var exprSet = "set ";
     

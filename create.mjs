@@ -1,6 +1,7 @@
 import { ALLOW_DUPLICATE, SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
+import { stringToDecimal } from './stringtodecimal.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
@@ -153,6 +154,12 @@ export const processCreate = async (event) => {
     values["shortid"] = {};
     values["shortid"]["type"] = 'sf-i-input';
     values["shortid"]["value"] = [shortId];
+    
+    var shortNumId = "";
+    shortNumId = parseInt((new Date()).getTime()/1000);
+    values["shortnumid"] = {};
+    values["shortnumid"]["type"] = 'sf-i-input';
+    values["shortnumid"]["value"] = [shortNumId];
     
     const item = {};
     for(var i = 0; i < Object.keys(values).length; i++) {
