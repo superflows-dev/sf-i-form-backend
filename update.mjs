@@ -139,9 +139,9 @@ export const processUpdate = async (event) => {
         shortId = JSON.parse(resultGet.Item["shortid"].S)[0];
     }
     
-    values["shortnumid"] = {};
-    values["shortnumid"]["type"] = 'sf-i-input';
-    values["shortnumid"]["value"] = [shortId];
+    values["shortid"] = {};
+    values["shortid"]["type"] = 'sf-i-input';
+    values["shortid"]["value"] = [shortId];
     
     var shortNumId = "";
     if(resultGet.Item["shortnumid"] == null) {
