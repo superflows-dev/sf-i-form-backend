@@ -90,7 +90,7 @@ export const processCreate = async (event) => {
         
     }
     
-    const valToBeSearched = values[SEARCH_INDEX].text != null ? (Array.isArray(values[SEARCH_INDEX].text) ? values[SEARCH_INDEX].text[0].replace(/'/g, '\\\'') : values[SEARCH_INDEX].text.replace(/'/g, '\\\'')) : (Array.isArray(values[SEARCH_INDEX].value) ? values[SEARCH_INDEX]["value"][0].replace(/'/g, '\\\'') : values[SEARCH_INDEX]["value"].replace(/'/g, '\\\''));
+    const valToBeSearched = values[SEARCH_INDEX].text != null ? (Array.isArray(values[SEARCH_INDEX].text) ? '"' + values[SEARCH_INDEX].text[0].replace(/'/g, '\\\'') + '"' :  '"' + values[SEARCH_INDEX].text.replace(/'/g, '\\\'')) + '"' : (Array.isArray(values[SEARCH_INDEX].value) ?  '"' + values[SEARCH_INDEX]["value"][0].replace(/'/g, '\\\'') + '"' : '"' + values[SEARCH_INDEX]["value"].replace(/'/g, '\\\'')) + '"';
     
     const searchResult = await processSearchName(valToBeSearched);
 
