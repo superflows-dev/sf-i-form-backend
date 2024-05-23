@@ -70,7 +70,7 @@ export const processListLarge = async (event) => {
     }
 
     
-    userId = "1234";
+    // userId = "1234";
 
     var searchstring = null;
     var cursor = null;
