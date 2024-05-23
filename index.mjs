@@ -1,6 +1,7 @@
 import { processCreate } from './create.mjs';
 import { processDelete } from './delete.mjs';
 import { processList } from './list.mjs';
+import { processListLarge } from './listlarge.mjs';
 import { processDetail } from './detail.mjs';
 import { processUpdate } from './update.mjs';
 import { processUpdateField } from './updatefield.mjs';
@@ -38,6 +39,12 @@ export const handler = async (event, context, callback) => {
           const resultList = await processList(event);
           response.body = JSON.stringify(resultList.body);
           response.statusCode = resultList.statusCode;
+        break;
+        
+        case "/listlarge":
+          const resultListLarge = await processListLarge(event);
+          response.body = JSON.stringify(resultListLarge.body);
+          response.statusCode = resultListLarge.statusCode;
         break;
         
         case "/detail":

@@ -1,6 +1,6 @@
 import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand } from "./globals.mjs";
 
-export const processSearchName = async (searchString, cursor) => {
+export const processSearchName = async (searchString, cursor, size = 10) => {
   
   const client = new CloudSearchDomainClient({ 
         endpoint: SEARCH_ENDPOINT,
@@ -57,7 +57,7 @@ export const processSearchName = async (searchString, cursor) => {
       query: query,
       queryParser: "simple",
       cursor: cursor,
-      size: 10
+      size: size
     };
     
     console.log(params);
