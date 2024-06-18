@@ -1,10 +1,11 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, ENTITY_NAME } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
+import { processManageChange } from './managechange.mjs';
 
 export const processUpdate = async (event) => {
 
@@ -132,6 +133,8 @@ export const processUpdate = async (event) => {
         return response;
     }
 
+    var oldName = resultGet.Item.name;
+
     var shortId = "";
     if(resultGet.Item["shortid"] == null) {
         shortId = (new Date()).getTime().toString(36);
@@ -216,6 +219,15 @@ export const processUpdate = async (event) => {
     }
     
     await processUploadSearch(id, values[SEARCH_INDEX].value, values)
+
+    await processManageChange(event["headers"]["Authorization"], 
+        { 
+            changedEntity: ENTITY_NAME,
+            changedEntityId: id,
+            changedEntityOldName: oldName.S,
+            changedEntityNewName: name
+        }
+    );
     
     const response = {statusCode: 200, body: {result: true}};
     processAddLog(userId, 'update', event, response, response.statusCode, delta)
