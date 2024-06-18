@@ -133,7 +133,7 @@ export const processUpdate = async (event) => {
         return response;
     }
 
-    var oldName = resultGet.Item.name;
+    var oldName = resultGet.Item[SEARCH_INDEX];
 
     var shortId = "";
     if(resultGet.Item["shortid"] == null) {
@@ -225,7 +225,7 @@ export const processUpdate = async (event) => {
             changedEntity: ENTITY_NAME,
             changedEntityId: id,
             changedEntityOldName: oldName.S,
-            changedEntityNewName: name
+            changedEntityNewName: values[SEARCH_INDEX].value
         }
     );
     
