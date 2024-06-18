@@ -75,10 +75,12 @@ export const processUpdate = async (event) => {
 
     var id = null;
     var values = null;
+    var disablechange = "";
     
     try {
         id = JSON.parse(event.body).id.trim();
         values = JSON.parse(event.body).values;
+        disablechange = JSON.parse(event.body).disablechange;
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
         processAddLog(userId, 'update', event, response, response.statusCode)
@@ -96,7 +98,13 @@ export const processUpdate = async (event) => {
         processAddLog(userId, 'update', event, response, response.statusCode)
         return response;
     }
-    
+
+    var disableChangeManagement = false;
+
+    if(disablechange != null && disablechange) {
+      disableChangeManagement = true;
+    }
+
     for(var i = 0; i < Object.keys(values).length; i++) {
         
         if(!FIELDS.includes(Object.keys(values)[i])) {
@@ -220,14 +228,16 @@ export const processUpdate = async (event) => {
     
     await processUploadSearch(id, values[SEARCH_INDEX].value, values)
 
-    await processManageChange(event["headers"]["Authorization"], 
-        { 
-            changedEntity: ENTITY_NAME,
-            changedEntityId: id,
-            changedEntityOldName: oldName.S,
-            changedEntityNewName: values[SEARCH_INDEX].value
-        }
-    );
+    if(!disableChangeManagement) {
+        await processManageChange(event["headers"]["Authorization"], 
+            { 
+                changedEntity: ENTITY_NAME,
+                changedEntityId: id,
+                changedEntityOldName: oldName.S,
+                changedEntityNewName: values[SEARCH_INDEX].value
+            }
+        );
+    }
     
     const response = {statusCode: 200, body: {result: true}};
     processAddLog(userId, 'update', event, response, response.statusCode, delta)
