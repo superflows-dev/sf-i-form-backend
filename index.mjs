@@ -27,7 +27,15 @@ export const handler = async (event, context, callback) => {
       return;
     }
     
-    switch(event["path"]) {
+    var path = ""; 
+    
+    if(event["path"] != null) {
+      path = event["path"];
+    } else {
+      path = event["rawPath"];
+    }
+    
+    switch(path) {
       
         case "/create":
           const resultCreate = await processCreate(event);
