@@ -57,7 +57,8 @@ export const processSearchName = async (searchString, cursor, size = 10) => {
       query: query,
       queryParser: "simple",
       cursor: cursor,
-      size: size
+      size: size,
+      sort: 'data asc'
     };
     
     console.log(params);
