@@ -34,6 +34,12 @@ export const handler = async (event, context, callback) => {
     } else {
       path = event["rawPath"];
     }
+
+    if(event["headers"]["authorization"] != null) {
+      event["headers"]["Authorization"] = event["headers"]["authorization"]
+    } else if(event["headers"]["Authorization"] != null) {
+      event["headers"]["authorization"] = event["headers"]["Authorization"]
+    }
     
     switch(path) {
       
