@@ -23,9 +23,8 @@ const DELETE_SEARCH_THRESHOLD = "DELETE_THRESHOLD";
 
 const ENTITY_NAME = "ENTITY_NAME_VALUE";
 
-const CHANGE_ENDPOINT_HOST = "AWS_CHANGE_ENDPOINT.execute-api.us-east-1.amazonaws.com";
-const CHANGE_ENDPOINT_PATH = "/test/startjob";
-
+const CHANGE_ENDPOINT_HOST = "AWS_CHANGE_ENDPOINT.lambda-url.us-east-1.on.aws";
+const CHANGE_ENDPOINT_PATH = "/startjob";
 
 const SEARCH_ENDPOINT = "AWS_SEARCH_ENDPOINT";
 

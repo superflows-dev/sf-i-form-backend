@@ -4,16 +4,18 @@ import { AUTH_REGION, AUTH_API, AUTH_STAGE } from "./globals.mjs";
 export const processAuthenticate = async (authorization) => {
   
   let myPromise = new Promise(function(resolve, reject) {
-    
+
     var options = {
-       host: AUTH_API + '.execute-api.' + AUTH_REGION + '.amazonaws.com',
+       host: AUTH_API + '.lambda-url.' + AUTH_REGION + '.on.aws',
        port: 443,
        method: 'POST',
-       path: '/' + AUTH_STAGE + '/validate',
+       path: '/validate',
        headers: {
           'Authorization': authorization
        }   
     };
+    
+    console.log(options);
     
     //this is the call
     var request = https.get(options, function(response){
