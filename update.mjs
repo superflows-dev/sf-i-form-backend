@@ -220,7 +220,9 @@ export const processUpdate = async (event) => {
         if(values[Object.keys(values)[i]] != "id") {
             
             const oldKey = (resultGet.Item[Object.keys(values)[i]] != null) ? (resultGet.Item[Object.keys(values)[i]]["S"]) : "";
-            delta.push(Object.keys(values)[i] + ":" + oldKey + ":" + JSON.stringify(values[Object.keys(values)[i]].value))
+            if(oldKey !== JSON.stringify(values[Object.keys(values)[i]].value)){
+                delta.push({'field':Object.keys(values)[i], "oldValue" : oldKey, "newValue" : JSON.stringify(values[Object.keys(values)[i]].value)})
+            }
             
         }
         
@@ -234,7 +236,8 @@ export const processUpdate = async (event) => {
                 changedEntity: ENTITY_NAME,
                 changedEntityId: id,
                 changedEntityOldName: oldName.S,
-                changedEntityNewName: values[SEARCH_INDEX].value
+                changedEntityNewName: values[SEARCH_INDEX].value,
+                delta: delta
             }
         );
     }
