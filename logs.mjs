@@ -43,10 +43,34 @@ export const processLogs = async (event) => {
             return {statusCode: 401, body: {result: false, error: "Unauthorized request!"}};
         }   
     }
-
-    const logs = await processGetLog();
     
-    const response = {statusCode: 200, body: {result: true, data: logs.body.result.events}};
+    var starttime = null;
+    var endtime = null;
+    
+    try {
+        starttime = JSON.parse(event.body).starttime.trim();
+        endtime = JSON.parse(event.body).endtime.trim();
+    } catch (e) {
+        console.log(e, event.body)
+        const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
+        //processAddLog(userId, 'detail', event, response, response.statusCode)
+        return response;
+    }
+    
+    if(starttime == null || starttime == "" || starttime.length < 6) {
+        const response = {statusCode: 400, body: {result: false, error: "Start Time is not valid!"}}
+       // processAddLog(userId, 'detail', event, response, response.statusCode)
+        return response;
+    }
+    if(endtime== null || endtime == "" || endtime.length < 6) {
+        const response = {statusCode: 400, body: {result: false, error: "End Time is not valid!"}}
+       // processAddLog(userId, 'detail', event, response, response.statusCode)
+        return response;
+    }
+
+    const logs = await processGetLog(starttime, endtime);
+    
+    const response = {statusCode: 200, body: {result: true, data: logs.body.result}};
     return response;
     
 }

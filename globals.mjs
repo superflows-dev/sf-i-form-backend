@@ -3,6 +3,11 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { ScanCommand, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { CloudSearchDomainClient, UploadDocumentsCommand, SearchCommand } from "@aws-sdk/client-cloudsearch-domain";
 import { CloudWatchLogsClient, PutLogEventsCommand, GetLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
+import { PutObjectCommand, S3Client, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({});
+
+const S3_BUCKET_NAME = "AWS_LOG_BUCKET_NAME"
 
 const ddbClient = new DynamoDBClient({ region: REGION });
 
@@ -62,5 +67,10 @@ export {
     DELETE_SEARCH_THRESHOLD,ALLOW_DUPLICATE,
     CHANGE_ENDPOINT_HOST,
     CHANGE_ENDPOINT_PATH,
-    ENTITY_NAME
+    ENTITY_NAME,
+    s3Client,
+    GetObjectCommand,
+    PutObjectCommand,
+    ListObjectsV2Command,
+    S3_BUCKET_NAME
 };
