@@ -7,6 +7,7 @@ import { processUpdate } from './update.mjs';
 import { processUpdateField } from './updatefield.mjs';
 import { processScanByField } from './scanbyfield.mjs';
 import { processLogs } from './logs.mjs';
+import { processGetLatestList } from './getlatestlist.mjs';
 import { ENTITY_NAME } from './globals.mjs';
 
 export const handler = async (event, context, callback) => {
@@ -118,6 +119,13 @@ export const handler = async (event, context, callback) => {
           const resultLogs = await processLogs(event);
           response.body = JSON.stringify(resultLogs.body);
           response.statusCode = resultLogs.statusCode;
+        break;
+        
+        case "/"+ENTITY_NAME+"/getlatestlist":
+        case "/getlatestlist":
+          const resultLatestList = await processGetLatestList(event);
+          response.body = JSON.stringify(resultLatestList.body);
+          response.statusCode = resultLatestList.statusCode;
         break;
         
     }
