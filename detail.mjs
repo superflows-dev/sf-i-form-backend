@@ -1,10 +1,10 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, SERVER_KEY } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, SERVER_KEY, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
-
+import { processDecryptData } from './decryptdata.mjs'
 export const processDetail = async (event) => {
 
     var serverkey = "";
@@ -63,9 +63,12 @@ export const processDetail = async (event) => {
     // userId = "1234";
 
     var id = null;
-    
+    var projectId = "";
     try {
         id = JSON.parse(event.body).id.trim();
+        if(JSON.parse(event.body).projectid != null){
+            projectId = JSON.parse(event.body).projectid.trim()
+        }
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
         //processAddLog(userId, 'detail', event, response, response.statusCode)
@@ -101,10 +104,19 @@ export const processDetail = async (event) => {
        // processAddLog(userId, 'detail', event, response, response.statusCode)
         return response;
     }
-    
+    for(var i = 0; i < Object.keys(resultGet.Item).length; i++){
+        if(Object.keys(resultGet.Item)[i] == 'project'){
+            projectId = JSON.parse(resultGet.Item[Object.keys(resultGet.Item)[i]].S)[0]
+            console.log('project found', projectId)
+        }
+    }
     var unmarshalledItem = {};
-    for(var i = 0; i < Object.keys(resultGet.Item).length; i++) {
-        unmarshalledItem[Object.keys(resultGet.Item)[i]] = resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]];
+    for(i = 0; i < Object.keys(resultGet.Item).length; i++) {
+        if(ENCRYPTED_FIELDS.includes(Object.keys(resultGet.Item)[i]) && projectId != null && projectId != ""){
+            unmarshalledItem[Object.keys(resultGet.Item)[i]] = await processDecryptData(projectId, resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]]);
+        }else{
+            unmarshalledItem[Object.keys(resultGet.Item)[i]] = resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]];
+        }
     }
     
     const response = {statusCode: 200, body: {result: true, data: {value: unmarshalledItem}}};

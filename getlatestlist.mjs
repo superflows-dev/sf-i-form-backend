@@ -1,7 +1,8 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, SEARCH_INDEX } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, SEARCH_INDEX, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { processGetLogNotifications } from './getlognotifications.mjs';
 import { processSearchName } from './searchname.mjs';
+import { processDecryptData } from './decryptdata.mjs'
 
 export const processGetLatestList = async (event) => {
 
@@ -85,6 +86,31 @@ export const processGetLatestList = async (event) => {
     }
     console.log('searchTerms', searchTerms.join('|'))
     const searchResult = await processSearchName(searchTerms.join('|'), "initial");
+    for(let [i, hit] of searchResult.hits.hit.entries()){
+        let cols = JSON.parse(hit.fields.cols)
+        let data = JSON.parse(hit.fields.data)
+        let projectId = "";
+        let flagFoundEncrypted = false
+        if(cols.indexOf('project') >= 0){
+            projectId = data[cols.length + cols.indexOf('project')][0]
+            console.log('projectid data',data,cols.indexOf('project'),cols.length, data.length)
+            console.log('projectId found', projectId)
+            for(let [j,col] of cols.entries()){
+                if(ENCRYPTED_FIELDS.includes(col) && projectId != null && projectId != ""){
+                    
+                    let decryptedData = await processDecryptData(projectId, JSON.stringify(data[j])) 
+                    data[j] = JSON.parse(decryptedData)
+                    flagFoundEncrypted = true;
+                    
+                }
+            }
+        }
+        
+        if(flagFoundEncrypted){
+            console.log('decrypted', data.length)
+            searchResult.hits.hit[i].fields.data = JSON.stringify(data)
+        }
+    }
     const response = {statusCode: 200, body: {result: true, data: searchResult.hits.hit}};
     return response;
     

@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, ENTITY_NAME } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, ENTITY_NAME, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
@@ -6,6 +6,7 @@ import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
 import { processManageChange } from './managechange.mjs';
+import { processEncryptData } from './encryptdata.mjs';
 
 export const processUpdate = async (event) => {
 
@@ -104,13 +105,15 @@ export const processUpdate = async (event) => {
     if(disablechange != null && disablechange) {
       disableChangeManagement = true;
     }
-
+    let projectId = ""
     for(var i = 0; i < Object.keys(values).length; i++) {
-        
+        if(Object.keys(values)[i] == "project"){
+            projectId = values[Object.keys(values)[i]].value[0]
+        }
         if(!FIELDS.includes(Object.keys(values)[i])) {
             
             const response = {statusCode: 400, body: {result: false, error: "Values are not valid!"}}
-            processAddLog(userId, 'update', event, response, response.statusCode)
+            processAddLog(userId, 'update', event, response, response.statusCode, projectId)
             return response;
             
         }
@@ -137,7 +140,7 @@ export const processUpdate = async (event) => {
     
     if(resultGet.Item == null) {
         const response = {statusCode: 404, body: {result: false, error: "Record does not exist!"}}
-        processAddLog(userId, 'update', event, response, response.statusCode)
+        processAddLog(userId, 'update', event, response, response.statusCode, projectId)
         return response;
     }
 
@@ -187,8 +190,12 @@ export const processUpdate = async (event) => {
     var exprValues = {};
     
     for(var i = 0; i < Object.keys(values).length; i++) {
-        
-        exprValues[':' + Object.keys(values)[i] + "1"] = {S: JSON.stringify(values[Object.keys(values)[i]].value)};
+        if(ENCRYPTED_FIELDS.includes(Object.keys(values)[i]) && projectId != null && projectId != ""){
+            let encryptedData = await processEncryptData(projectId,JSON.stringify(values[Object.keys(values)[i]].value))
+            exprValues[':' + Object.keys(values)[i] + "1"] = {S: encryptedData};
+        }else{
+            exprValues[':' + Object.keys(values)[i] + "1"] = {S: JSON.stringify(values[Object.keys(values)[i]].value)};
+        }
         
     }
     
@@ -228,7 +235,7 @@ export const processUpdate = async (event) => {
         
     }
     
-    await processUploadSearch(id, values[SEARCH_INDEX].value, values)
+    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId)
 
     if(!disableChangeManagement) {
         await processManageChange(event["headers"]["Authorization"], 
@@ -243,7 +250,7 @@ export const processUpdate = async (event) => {
     }
     
     const response = {statusCode: 200, body: {result: true}};
-    processAddLog(userId, 'update', event, response, response.statusCode, delta)
+    processAddLog(userId, 'update', event, response, response.statusCode, projectId, delta)
     return response;
 
 }

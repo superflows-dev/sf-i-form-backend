@@ -1,6 +1,6 @@
 import { CloudWatchLogsClient, GetLogEventsCommand, REGION, LOG_GROUP_NAME, ListObjectsV2Command, s3Client, S3_BUCKET_NAME, GetObjectCommand } from "./globals.mjs";
 import { newUuidV4 } from './newuuid.mjs'
-
+import { processDecryptData} from './decryptdata.mjs'
 export const processGetLog = async (starttime, endtime) => {
     
     const startDate = new Date(parseInt(starttime));
@@ -85,7 +85,11 @@ export const processGetLog = async (starttime, endtime) => {
                 chunks.push(chunk)
             }
             const responseBuffer = Buffer.concat(chunks)
-            const jsonContent = JSON.parse(responseBuffer.toString());
+            let responsedata = responseBuffer.toString()
+            if(!isJsonString(responsedata)){
+                responsedata = await processDecryptData("", responsedata)
+            }
+            const jsonContent = JSON.parse(responsedata);
             
             let filenameArr = file.Key.split("/")
             let filename = filenameArr[filenameArr.length - 1]
@@ -99,4 +103,13 @@ export const processGetLog = async (starttime, endtime) => {
     console.log("logs", data)
     return {statusCode: 200, body: {result: data}};
 
+}
+
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }

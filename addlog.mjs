@@ -1,7 +1,7 @@
 import { CloudWatchLogsClient, PutLogEventsCommand, REGION, LOG_GROUP_NAME, PutObjectCommand, s3Client, S3_BUCKET_NAME } from "./globals.mjs";
 import { newUuidV4 } from './newuuid.mjs'
-
-export const processAddLog = async (userId, op, req, resp, httpCode, delta = null) => {
+import { processEncryptData } from './encryptdata.mjs'
+export const processAddLog = async (userId, op, req, resp, httpCode, projectid = "", delta = null) => {
     
     
     let logObject = {userId: userId, op: op, req: req, resp: resp, httpCode: httpCode, delta: delta}
@@ -15,11 +15,15 @@ export const processAddLog = async (userId, op, req, resp, httpCode, delta = nul
         month = '0' + month;
     if (day.length < 2) 
         day = '0' + day;
-        
+    
+    let logData = JSON.stringify(logObject)
+    if(projectid != null && projectid != ""){
+        logData = await processEncryptData(projectid, logData)
+    }
     let command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: year + '/' + month + '/' + d.getTime() + '_log.json',
-        Body: JSON.stringify(logObject),
+        Body: logData,
         ContentType: 'application/json'
     });
     

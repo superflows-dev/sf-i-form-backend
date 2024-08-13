@@ -4,6 +4,9 @@ import { ScanCommand, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteI
 import { CloudSearchDomainClient, UploadDocumentsCommand, SearchCommand } from "@aws-sdk/client-cloudsearch-domain";
 import { CloudWatchLogsClient, PutLogEventsCommand, GetLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
 import { PutObjectCommand, S3Client, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
+
+const kmsClient = new KMSClient({ region: REGION });
 
 const s3Client = new S3Client({});
 
@@ -21,6 +24,7 @@ const AUTH_STAGE = "test";
 
 const ADMIN_METHODS = BACKEND_ADMIN_METHODS;
 const FIELDS = INPUT_FIELDS;
+const ENCRYPTED_FIELDS = INPUT_ENCRYPTED_FIELDS;
 const SEARCH_INDEX = "S_INDEX";
 const SERVER_KEY = "S_KEY";
 
@@ -63,6 +67,7 @@ export {
     ADMIN_METHODS,
     SEARCH_INDEX,
     FIELDS,
+    ENCRYPTED_FIELDS,
     GetLogEventsCommand,
     DELETE_SEARCH_THRESHOLD,ALLOW_DUPLICATE,
     CHANGE_ENDPOINT_HOST,
@@ -72,5 +77,8 @@ export {
     GetObjectCommand,
     PutObjectCommand,
     ListObjectsV2Command,
-    S3_BUCKET_NAME
+    S3_BUCKET_NAME,
+    kmsClient,
+    EncryptCommand,
+    DecryptCommand
 };

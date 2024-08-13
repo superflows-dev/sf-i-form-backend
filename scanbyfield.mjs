@@ -1,10 +1,11 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, QueryCommand } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, UpdateItemCommand, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, QueryCommand, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
+import { processEncryptData } from './encryptdata.mjs';
 
 export const processScanByField = async (event) => {
 
@@ -68,31 +69,36 @@ export const processScanByField = async (event) => {
     
     var field = null;
     var value = null;
-    
+    let projectId = "";
     try {
         field = JSON.parse(event.body).field.trim();
         value = JSON.parse(event.body).value.trim();
+        if(JSON.parse(event.body).projectid != null){
+            projectId = JSON.parse(event.body).projectid.trim()
+        }
     } catch (e) {
         const response = {statusCode: 400, body: { result: false, error: "Malformed body!"}};
-        processAddLog(userId, 'scanbyfield', event, response, response.statusCode)
+        processAddLog(userId, 'scanbyfield', event, response, response.statusCode, projectId)
         return response;
     }
     
     if(value == null || value == "" || value.length < 0) {
         const response = {statusCode: 400, body: {result: false, error: "Value is not valid!"}}
-        processAddLog(userId, 'scanbyfield', event, response, response.statusCode)
+        processAddLog(userId, 'scanbyfield', event, response, response.statusCode, projectId)
         return response;
     }
     
     if(field == null || field == "" || field.length < 0) {
         const response = {statusCode: 400, body: {result: false, error: "Field is not valid!"}}
-        processAddLog(userId, 'scanbyfield', event, response, response.statusCode)
+        processAddLog(userId, 'scanbyfield', event, response, response.statusCode, projectId)
         return response;
     }
     
     var exprNames = {};
     exprNames["#"+field+"1"] = field;
-    
+    if(ENCRYPTED_FIELDS.includes(field) && projectId != null && projectId != ""){
+      value = await processEncryptData(value), projectId
+    }
     var exprValues = {};
     exprValues[":"+field+"1"] = {S: field == "id" ? value : '"' + value + '"'};
     
@@ -129,7 +135,7 @@ export const processScanByField = async (event) => {
     await ddbScanRecords(scanParams);
     
     const response = {statusCode: 200, body: {result: arrRecords}};
-    processAddLog(userId, 'scanbyfield', event, response, response.statusCode);
+    processAddLog(userId, 'scanbyfield', event, response, response.statusCode, projectId);
     return response;
 
 }

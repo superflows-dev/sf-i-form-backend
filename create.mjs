@@ -1,10 +1,10 @@
-import { ALLOW_DUPLICATE, SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY } from "./globals.mjs";
+import { ALLOW_DUPLICATE, SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, FIELDS, SERVER_KEY, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
-
+import { processEncryptData } from './encryptdata.mjs'
 export const processCreate = async (event) => {
 
     var serverkey = "";
@@ -77,13 +77,15 @@ export const processCreate = async (event) => {
         processAddLog(userId, 'create', event, response, response.statusCode)
         return response;
     }
-    
+    let projectId = ""
     for(var i = 0; i < Object.keys(values).length; i++) {
-        
+        if(Object.keys(values)[i] == "project"){
+            projectId = values[Object.keys(values)[i]].value[0]
+        }
         if(!FIELDS.includes(Object.keys(values)[i])) {
             
-            const response = {statusCode: 400, body: {result: false, error: "Values are not valid!"}}
-            processAddLog(userId, 'create', event, response, response.statusCode)
+            const response = {statusCode: 400, body: {result: false, error: "Values are not valid!", body: event.body}}
+            processAddLog(userId, 'create', event, response, response.statusCode, projectId)
             return response;
             
         }
@@ -135,7 +137,7 @@ export const processCreate = async (event) => {
                 console.log('comparing', unmarshalledItems[i][SEARCH_INDEX], valToBeSearched);
                 if(unmarshalledItems[i][SEARCH_INDEX].replace(/"/g, "") == (Array.isArray(values[SEARCH_INDEX].value) ? values[SEARCH_INDEX]["value"][0] : values[SEARCH_INDEX]["value"])) {
                     const response = {statusCode: 409, body: {result: false, error: "Item already exists! (Possible Duplicate)"}}
-                    processAddLog(userId, 'create', event, response, response.statusCode)
+                    processAddLog(userId, 'create', event, response, response.statusCode, projectId)
                     return response;        
                 }
                 
@@ -162,7 +164,12 @@ export const processCreate = async (event) => {
     
     const item = {};
     for(var i = 0; i < Object.keys(values).length; i++) {
-        item[Object.keys(values)[i]] = {"S": JSON.stringify(values[Object.keys(values)[i]].value)};
+        if(ENCRYPTED_FIELDS.includes(Object.keys(values)[i]) && projectId != null && projectId != ""){
+            let encryptedData = await processEncryptData(projectId,JSON.stringify(values[Object.keys(values)[i]].value))
+            item[Object.keys(values)[i]] = {"S": encryptedData};
+        }else{
+            item[Object.keys(values)[i]] = {"S": JSON.stringify(values[Object.keys(values)[i]].value)};
+        }
     }
     item["id"] = {"S": id};
     
@@ -182,10 +189,10 @@ export const processCreate = async (event) => {
     
     const resultPut = await ddbPut();
     
-    await processUploadSearch(id, values[SEARCH_INDEX].value, values)
+    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId)
     
     const response = {statusCode: 200, body: {result: true}};
-    processAddLog(userId, 'create', event, response, response.statusCode)
+    processAddLog(userId, 'create', event, response, response.statusCode, projectId)
     return response;
 
 }

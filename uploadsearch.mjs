@@ -1,6 +1,7 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS, ENCRYPTED_FIELDS } from "./globals.mjs";
+import { processEncryptData } from './encryptdata.mjs'
 
-export const processUploadSearch = async (id, name, values) => {
+export const processUploadSearch = async (id, name, values, projectId) => {
   
     const client = new CloudSearchDomainClient({  
         endpoint: SEARCH_ENDPOINT.replace('search-', 'doc-'),
@@ -19,13 +20,20 @@ export const processUploadSearch = async (id, name, values) => {
       console.log(MODFIELDS[i]);
     
       if(values[MODFIELDS[i]].text != null) {
-      
-        data.push(values[MODFIELDS[i]].text);
+        if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
+          console.log('encrypting text', MODFIELDS[i], values[MODFIELDS[i]].text, projectId)
+          data.push(await processEncryptData( projectId, JSON.stringify(values[MODFIELDS[i]].text)))
+        }else{
+          data.push(values[MODFIELDS[i]].text);
+        }
         
       } else {
-        
-        data.push(values[MODFIELDS[i]].value);
-      
+        if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
+          console.log('encrypting value', MODFIELDS[i], values[MODFIELDS[i]].value)
+          data.push(await processEncryptData( projectId, JSON.stringify(values[MODFIELDS[i]].value)))
+        }else{
+          data.push(values[MODFIELDS[i]].value);
+        }
       }
       
       cols.push(MODFIELDS[i]);
@@ -33,8 +41,11 @@ export const processUploadSearch = async (id, name, values) => {
     }
 
     for(var i = 0; i < MODFIELDS.length; i++) {
-      
-      data.push(values[MODFIELDS[i]].value);
+      if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
+        data.push(await processEncryptData(projectId, JSON.stringify(values[MODFIELDS[i]].value)))
+      }else{
+        data.push(values[MODFIELDS[i]].value);
+      }
       
     }
     

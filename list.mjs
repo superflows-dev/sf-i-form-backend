@@ -1,10 +1,10 @@
-import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, SERVER_KEY } from "./globals.mjs";
+import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, GetItemCommand, DeleteItemCommand, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, ADMIN_METHODS, SEARCH_INDEX, SERVER_KEY, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processAuthenticate } from './authenticate.mjs';
 import { newUuidV4 } from './newuuid.mjs';
 import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
-
+import { processDecryptData } from './decryptdata.mjs'
 export const processList = async (event) => {
 
     var serverkey = "";
@@ -94,6 +94,32 @@ export const processList = async (event) => {
     }
     
     const searchResult = await processSearchName(searchstring, cursor);
+    
+    for(let [i, hit] of searchResult.hits.hit.entries()){
+        let cols = JSON.parse(hit.fields.cols)
+        let data = JSON.parse(hit.fields.data)
+        let projectId = "";
+        let flagFoundEncrypted = false
+        if(cols.indexOf('project') >= 0){
+            projectId = data[cols.length + cols.indexOf('project')][0]
+            console.log('projectid data',data,cols.indexOf('project'),cols.length, data.length)
+            console.log('projectId found', projectId)
+            for(let [j,col] of cols.entries()){
+                if(ENCRYPTED_FIELDS.includes(col) && projectId != null && projectId != ""){
+                    
+                    let decryptedData = await processDecryptData(projectId, JSON.stringify(data[j])) 
+                    data[j] = JSON.parse(decryptedData)
+                    flagFoundEncrypted = true;
+                    
+                }
+            }
+        }
+        
+        if(flagFoundEncrypted){
+            console.log('decrypted', data.length)
+            searchResult.hits.hit[i].fields.data = JSON.stringify(data)
+        }
+    }
     
     const response = {statusCode: 200, body: {result: true, values: searchResult.hits.hit, cursor: searchResult.hits.cursor, found: searchResult.hits.found}};
     //processAddLog(userId, 'list', event, response, response.statusCode)
