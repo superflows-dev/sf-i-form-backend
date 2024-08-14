@@ -95,19 +95,7 @@ export const processScanByField = async (event) => {
         return response;
     }
     
-    var exprNames = {};
-    exprNames["#"+field+"1"] = field;
-    let maskedValue = ""
-    let flagEncryptedFound = false
-    if(ENCRYPTED_FIELDS.includes(field)){
-        console.log('masking text', value)
-        maskedValue = await processMaskValue(value)
-    }
-    let searchResult = await processSearchName(value);
-    if(searchResult.hits.found == 0 && maskedValue != ""){
-        searchResult = await processSearchName(maskedValue)
-        flagEncryptedFound = true
-    }
+    const arrRecords = [];
     
     async function ddbGet () {
         try {
@@ -117,68 +105,87 @@ export const processScanByField = async (event) => {
           return err;
         }
     };
-    const arrRecords = [];
-    console.log('searchResult', searchResult)
-    for(let hit of searchResult.hits.hit){
-        let id = hit.id
-        var getParams = {
-            TableName: TABLE,
-            Key: {
-              id: { S: id },
-            },
-        };
-        
-        
-        
-        var resultGet = await ddbGet();
-        
-        for (let itemField of Object.keys(resultGet.Item)){
-            if(ENCRYPTED_FIELDS.includes(itemField)){
-                let value = resultGet.Item[itemField].S
-                if(flagEncryptedFound){
-                    value = await processDecryptData(resultGet.Item[itemField].S)
-                }
-                console.log('flagEncryptedFound', flagEncryptedFound, value)
-                resultGet.Item[itemField] = {S: value }
-            }
+    
+    if(field != 'id'){
+        let flagEncryptedFound = false
+        let maskedValue = ""
+        if(ENCRYPTED_FIELDS.includes(field)){
+            console.log('masking text', value)
+            maskedValue = await processMaskValue(value)
+        }
+        let searchResult = await processSearchName(value);
+        if(searchResult.hits.found == 0 && maskedValue != ""){
+            searchResult = await processSearchName(maskedValue)
+            flagEncryptedFound = true
         }
         
-        arrRecords.push(resultGet.Item)
+        
+        
+        console.log('searchResult', searchResult)
+        for(let hit of searchResult.hits.hit){
+            let id = hit.id
+            var getParams = {
+                TableName: TABLE,
+                Key: {
+                  id: { S: id },
+                },
+            };
+            
+            
+            
+            var resultGet = await ddbGet();
+            
+            for (let itemField of Object.keys(resultGet.Item)){
+                if(ENCRYPTED_FIELDS.includes(itemField)){
+                    let value = resultGet.Item[itemField].S
+                    if(flagEncryptedFound){
+                        value = await processDecryptData(resultGet.Item[itemField].S)
+                    }
+                    console.log('flagEncryptedFound', flagEncryptedFound, value)
+                    resultGet.Item[itemField] = {S: value }
+                }
+            }
+            
+            arrRecords.push(resultGet.Item)
+        }
+    }else{
+        var exprNames = {};
+        exprNames["#"+field+"1"] = field;
+        var exprValues = {};
+        exprValues[":"+field+"1"] = {S: field == "id" ? value : '"' + value + '"'};
+        
+        var scanParams = {
+            FilterExpression: "#"+field+"1 = :"+field+"1",
+            ExpressionAttributeValues: exprValues,
+            ExpressionAttributeNames:  exprNames,
+            TableName: TABLE
+        };
+        
+        console.log('scanParams', scanParams);
+        
+        
+        const ddbScanRecords = async (queryParams, exclusiveStartKey = null) => {
+            console.log('inside scan');
+            try {
+                if(exclusiveStartKey != null) {
+                    queryParams['ExclusiveStartKey'] = exclusiveStartKey;
+                }
+                const data = await ddbClient.send(new ScanCommand(queryParams));
+                console.log('data', data);
+                for(var m = 0; m < data.Items.length; m++) {
+                    arrRecords.push(data.Items[m])
+                }
+                if(data.LastEvaluatedKey != null) {
+                    await ddbScanRecords(queryParams, data.LastEvaluatedKey);
+                }
+                return;
+            } catch (err) {
+                console.log('inside scan', err);
+                return err;
+            }
+        };
+        await ddbScanRecords(scanParams);
     }
-    // var exprValues = {};
-    // exprValues[":"+field+"1"] = {S: field == "id" ? value : '"' + value + '"'};
-    
-    // var scanParams = {
-    //     FilterExpression: "#"+field+"1 = :"+field+"1",
-    //     ExpressionAttributeValues: exprValues,
-    //     ExpressionAttributeNames:  exprNames,
-    //     TableName: TABLE
-    // };
-    
-    // console.log('scanParams', scanParams);
-    
-    
-    // const ddbScanRecords = async (queryParams, exclusiveStartKey = null) => {
-    //     console.log('inside scan');
-    //     try {
-    //         if(exclusiveStartKey != null) {
-    //             queryParams['ExclusiveStartKey'] = exclusiveStartKey;
-    //         }
-    //         const data = await ddbClient.send(new ScanCommand(queryParams));
-    //         console.log('data', data);
-    //         for(var m = 0; m < data.Items.length; m++) {
-    //             arrRecords.push(data.Items[m])
-    //         }
-    //         if(data.LastEvaluatedKey != null) {
-    //             await ddbScanRecords(queryParams, data.LastEvaluatedKey);
-    //         }
-    //         return;
-    //     } catch (err) {
-    //         console.log('inside scan', err);
-    //         return err;
-    //     }
-    // };
-    // await ddbScanRecords(scanParams);
     
     const response = {statusCode: 200, body: {result: arrRecords}};
     // processAddLog(userId, 'scanbyfield', event, response, response.statusCode, projectId);
