@@ -92,13 +92,13 @@ export const processGetLatestList = async (event) => {
         let projectId = "";
         let flagFoundEncrypted = false
         if(cols.indexOf('project') >= 0){
-            projectId = data[cols.length + cols.indexOf('project')][0]
-            console.log('projectid data',data,cols.indexOf('project'),cols.length, data.length)
-            console.log('projectId found', projectId)
+            // projectId = data[cols.length + cols.indexOf('project')][0]
+            // console.log('projectid data',data,cols.indexOf('project'),cols.length, data.length)
+            // console.log('projectId found', projectId)
             for(let [j,col] of cols.entries()){
-                if(ENCRYPTED_FIELDS.includes(col) && projectId != null && projectId != ""){
+                if(ENCRYPTED_FIELDS.includes(col)){
                     
-                    let decryptedData = await processDecryptData(projectId, JSON.stringify(data[j])) 
+                    let decryptedData = await processDecryptData(JSON.stringify(data[j])) 
                     data[j] = JSON.parse(decryptedData)
                     flagFoundEncrypted = true;
                     

@@ -1,5 +1,5 @@
 import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS, ENCRYPTED_FIELDS } from "./globals.mjs";
-import { processEncryptData } from './encryptdata.mjs'
+import { processMaskValue } from './maskvalue.mjs'
 
 export const processUploadSearch = async (id, name, values, projectId) => {
   
@@ -21,16 +21,17 @@ export const processUploadSearch = async (id, name, values, projectId) => {
     
       if(values[MODFIELDS[i]].text != null) {
         if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
-          console.log('encrypting text', MODFIELDS[i], values[MODFIELDS[i]].text, projectId)
-          data.push(await processEncryptData( projectId, JSON.stringify(values[MODFIELDS[i]].text)))
+          console.log('masking text', MODFIELDS[i], `"${values[MODFIELDS[i]].text}"`)
+          data.push(processMaskValue( values[MODFIELDS[i]].text))
         }else{
           data.push(values[MODFIELDS[i]].text);
         }
         
       } else {
         if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
-          console.log('encrypting value', MODFIELDS[i], values[MODFIELDS[i]].value)
-          data.push(await processEncryptData( projectId, JSON.stringify(values[MODFIELDS[i]].value)))
+          let maskedValue = processMaskValue(values[MODFIELDS[i]].value)
+          console.log('masking value', MODFIELDS[i], values[MODFIELDS[i]].value, maskedValue)
+          data.push(maskedValue)
         }else{
           data.push(values[MODFIELDS[i]].value);
         }
@@ -42,7 +43,7 @@ export const processUploadSearch = async (id, name, values, projectId) => {
 
     for(var i = 0; i < MODFIELDS.length; i++) {
       if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
-        data.push(await processEncryptData(projectId, JSON.stringify(values[MODFIELDS[i]].value)))
+        data.push(processMaskValue(JSON.stringify(values[MODFIELDS[i]].value)))
       }else{
         data.push(values[MODFIELDS[i]].value);
       }
@@ -60,7 +61,7 @@ export const processUploadSearch = async (id, name, values, projectId) => {
       contentType: "application/json",
     };
     
-    console.log(input);
+    // console.log(input);
     
     const command = new UploadDocumentsCommand(input);
     

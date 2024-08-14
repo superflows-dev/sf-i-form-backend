@@ -165,7 +165,7 @@ export const processCreate = async (event) => {
     const item = {};
     for(var i = 0; i < Object.keys(values).length; i++) {
         if(ENCRYPTED_FIELDS.includes(Object.keys(values)[i]) && projectId != null && projectId != ""){
-            let encryptedData = await processEncryptData(projectId,JSON.stringify(values[Object.keys(values)[i]].value))
+            let encryptedData = await processEncryptData(JSON.stringify(values[Object.keys(values)[i]].value))
             item[Object.keys(values)[i]] = {"S": encryptedData};
         }else{
             item[Object.keys(values)[i]] = {"S": JSON.stringify(values[Object.keys(values)[i]].value)};

@@ -6,6 +6,7 @@ import { processDetail } from './detail.mjs';
 import { processUpdate } from './update.mjs';
 import { processUpdateField } from './updatefield.mjs';
 import { processScanByField } from './scanbyfield.mjs';
+import { processScanByField1 } from './scanbyfield1.mjs';
 import { processLogs } from './logs.mjs';
 import { processGetLatestList } from './getlatestlist.mjs';
 import { ENTITY_NAME } from './globals.mjs';

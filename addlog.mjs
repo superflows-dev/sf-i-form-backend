@@ -17,9 +17,9 @@ export const processAddLog = async (userId, op, req, resp, httpCode, projectid =
         day = '0' + day;
     
     let logData = JSON.stringify(logObject)
-    if(projectid != null && projectid != ""){
-        logData = await processEncryptData(projectid, logData)
-    }
+    // if(projectid != null && projectid != ""){
+        logData = await processEncryptData(logData)
+    // }
     let command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: year + '/' + month + '/' + d.getTime() + '_log.json',

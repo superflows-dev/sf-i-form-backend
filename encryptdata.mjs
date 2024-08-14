@@ -2,15 +2,15 @@ import { processKmsEncrypt } from './kmsencrypt.mjs';
 import crypto from 'crypto';
 
 
-export const processEncryptData = async (projectid, strData) => {
+export const processEncryptData = async (strData) => {
     
     const newSecret = process.env.ENCRYPTION_SECRET;
     const newKey = crypto.createHash('sha256').update(String(newSecret)).digest('base64').substr(0, 32);
-    const newIV = crypto.randomBytes(16);
+    const newIV = process.env.ENCRYPTION_VECTOR;
     const newIVStr = newIV.toString('base64')
-    
-    const newEncSecret = await processKmsEncrypt(projectid, newSecret);
-    const newEncKey = await processKmsEncrypt(projectid, newKey);
+    console.log('encryption key elements', newKey, newIVStr)
+    const newEncSecret = await processKmsEncrypt(newSecret);
+    const newEncKey = await processKmsEncrypt(newKey);
     
     const cipher = crypto.createCipheriv("aes-256-cbc", newKey, newIV)
     var strDataEncrypt = Buffer.from(

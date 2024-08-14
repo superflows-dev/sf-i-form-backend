@@ -1,13 +1,13 @@
 import {  kmsClient, DecryptCommand } from "./globals.mjs";
 
-export const processKmsDecrypt = async (projectid, plaintext) => {
+export const processKmsDecrypt = async (plaintext) => {
 
     var input;
     
     try {
     
         input = {
-          "KeyId": JSON.parse(process.env.KMS_KEY_REGISTER)[projectid] ?? null,
+          "KeyId": process.env.KMS_KEY,
           "CiphertextBlob": Buffer.from(plaintext, 'base64')
           
         };

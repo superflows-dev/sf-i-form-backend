@@ -112,8 +112,8 @@ export const processDetail = async (event) => {
     }
     var unmarshalledItem = {};
     for(i = 0; i < Object.keys(resultGet.Item).length; i++) {
-        if(ENCRYPTED_FIELDS.includes(Object.keys(resultGet.Item)[i]) && projectId != null && projectId != ""){
-            unmarshalledItem[Object.keys(resultGet.Item)[i]] = await processDecryptData(projectId, resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]]);
+        if(ENCRYPTED_FIELDS.includes(Object.keys(resultGet.Item)[i])){
+            unmarshalledItem[Object.keys(resultGet.Item)[i]] = await processDecryptData(resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]]);
         }else{
             unmarshalledItem[Object.keys(resultGet.Item)[i]] = resultGet.Item[Object.keys(resultGet.Item)[i]][Object.keys(resultGet.Item[Object.keys(resultGet.Item)[i]])[0]];
         }

@@ -2,10 +2,10 @@
 
 import { kmsClient, EncryptCommand } from "./globals.mjs";
 
-export const processKmsEncrypt = async (projectid, plaintext) => {
+export const processKmsEncrypt = async (plaintext) => {
     
     const input = {
-      "KeyId": JSON.parse(process.env.KMS_KEY_REGISTER)[projectid],
+      "KeyId": process.env.KMS_KEY,
       "Plaintext": Buffer.from(plaintext, 'utf-8')
     };
     

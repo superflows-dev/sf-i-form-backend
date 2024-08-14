@@ -87,7 +87,7 @@ export const processGetLog = async (starttime, endtime) => {
             const responseBuffer = Buffer.concat(chunks)
             let responsedata = responseBuffer.toString()
             if(!isJsonString(responsedata)){
-                responsedata = await processDecryptData("", responsedata)
+                responsedata = await processDecryptData(responsedata)
             }
             const jsonContent = JSON.parse(responsedata);
             

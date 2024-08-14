@@ -190,8 +190,8 @@ export const processUpdate = async (event) => {
     var exprValues = {};
     
     for(var i = 0; i < Object.keys(values).length; i++) {
-        if(ENCRYPTED_FIELDS.includes(Object.keys(values)[i]) && projectId != null && projectId != ""){
-            let encryptedData = await processEncryptData(projectId,JSON.stringify(values[Object.keys(values)[i]].value))
+        if(ENCRYPTED_FIELDS.includes(Object.keys(values)[i])){
+            let encryptedData = await processEncryptData(JSON.stringify(values[Object.keys(values)[i]].value))
             exprValues[':' + Object.keys(values)[i] + "1"] = {S: encryptedData};
         }else{
             exprValues[':' + Object.keys(values)[i] + "1"] = {S: JSON.stringify(values[Object.keys(values)[i]].value)};
