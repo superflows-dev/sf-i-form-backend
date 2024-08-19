@@ -7,12 +7,12 @@ import { processUploadSearch } from './uploadsearch.mjs';
 import { processDeleteSearch } from './deletesearch.mjs';
 import { processManageChange } from './managechange.mjs';
 import { processEncryptData } from './encryptdata.mjs';
-
+import { processGetUserNameFromEmail } from './getusernamefromemail.mjs'
 export const processUpdate = async (event) => {
 
     var serverkey = "";
     var userId = "1234"
-
+    let userName = ""
     if((event["headers"]["x-server-key"]) != null) {
         
         if((event["headers"]["x-server-key"]) != SERVER_KEY) {
@@ -68,7 +68,11 @@ export const processUpdate = async (event) => {
             }   
         }
 
-        userId = authResult.userId;
+        let responseUser = await processGetUserNameFromEmail(email, event["headers"]["Authorization"])
+        let user = responseUser.result[0]
+        userName = JSON.parse(user.name.S)
+        userId = user.id.S;
+        console.log('userName', userName)
 
     }
 
@@ -235,7 +239,7 @@ export const processUpdate = async (event) => {
         
     }
     
-    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId)
+    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId, userName, new Date().getTime())
 
     if(!disableChangeManagement) {
         await processManageChange(event["headers"]["Authorization"], 

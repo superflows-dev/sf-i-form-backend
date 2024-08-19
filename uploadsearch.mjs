@@ -1,7 +1,7 @@
 import { SEARCH_ENDPOINT, REGION, TABLE, AUTH_ENABLE, AUTH_REGION, AUTH_API, AUTH_STAGE, ddbClient, ScanCommand, PutItemCommand, CloudSearchDomainClient, SearchCommand, UploadDocumentsCommand, FIELDS, ENCRYPTED_FIELDS } from "./globals.mjs";
 import { processMaskValue } from './maskvalue.mjs'
 
-export const processUploadSearch = async (id, name, values, projectId) => {
+export const processUploadSearch = async (id, name, values, projectId, userName, timestamp) => {
   
     const client = new CloudSearchDomainClient({  
         endpoint: SEARCH_ENDPOINT.replace('search-', 'doc-'),
@@ -11,7 +11,8 @@ export const processUploadSearch = async (id, name, values, projectId) => {
     var data = [];
     var cols = [];
     
-    const MODFIELDS = JSON.parse(JSON.stringify(FIELDS));
+    let MODFIELDS = ['lastModifiedBy', 'lastModifiedTime'];
+    MODFIELDS.push(...JSON.parse(JSON.stringify(FIELDS)));
     MODFIELDS.push("shortid");
     MODFIELDS.push("shortnumid");
     
@@ -19,16 +20,20 @@ export const processUploadSearch = async (id, name, values, projectId) => {
       
       console.log(MODFIELDS[i]);
     
-      if(values[MODFIELDS[i]].text != null) {
+      if(values[MODFIELDS[i]] != null && values[MODFIELDS[i]].text != null) {
         if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
           console.log('masking text', MODFIELDS[i], `"${values[MODFIELDS[i]].text}"`)
-          data.push(processMaskValue( values[MODFIELDS[i]].text))
+          data.push(processMaskValue(values[MODFIELDS[i]].text.toString()))
         }else{
           data.push(values[MODFIELDS[i]].text);
         }
         
       } else {
-        if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
+        if(MODFIELDS[i] == "lastModifiedBy"){
+          data.push(userName)
+        }else if(MODFIELDS[i] == "lastModifiedTime"){
+          data.push(timestamp + "")
+        }else if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
           let maskedValue = processMaskValue(values[MODFIELDS[i]].value)
           console.log('masking value', MODFIELDS[i], values[MODFIELDS[i]].value, maskedValue)
           data.push(maskedValue)
@@ -44,7 +49,11 @@ export const processUploadSearch = async (id, name, values, projectId) => {
     for(var i = 0; i < MODFIELDS.length; i++) {
       if(ENCRYPTED_FIELDS.includes(MODFIELDS[i]) && projectId != null && projectId != ""){
         data.push(processMaskValue(JSON.stringify(values[MODFIELDS[i]].value)))
-      }else{
+      }else if(MODFIELDS[i] == "lastModifiedBy"){
+        data.push(userName)
+      }else if(MODFIELDS[i] == "lastModifiedTime"){
+        data.push(timestamp + "")
+      } if(values[MODFIELDS[i]] != null){
         data.push(values[MODFIELDS[i]].value);
       }
       

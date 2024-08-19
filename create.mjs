@@ -5,11 +5,12 @@ import { processAddLog } from './addlog.mjs';
 import { processSearchName } from './searchname.mjs';
 import { processUploadSearch } from './uploadsearch.mjs';
 import { processEncryptData } from './encryptdata.mjs'
+import { processGetUserNameFromEmail } from './getusernamefromemail.mjs'
 export const processCreate = async (event) => {
 
     var serverkey = "";
     var userId = "1234"
-
+    let userName = ""
     if(event["headers"]["x-server-key"] != null) {
         serverkey = event["headers"]["x-server-key"];
 
@@ -56,7 +57,11 @@ export const processCreate = async (event) => {
             }   
         }
 
-        userId = authResult.userId;
+        let responseUser = await processGetUserNameFromEmail(email, event["headers"]["Authorization"])
+        let user = responseUser.result[0]
+        userName = JSON.parse(user.name.S)
+        userId = user.id.S;
+        console.log('userName', userName)
 
     }
 
@@ -189,7 +194,7 @@ export const processCreate = async (event) => {
     
     const resultPut = await ddbPut();
     
-    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId)
+    await processUploadSearch(id, values[SEARCH_INDEX].value, values, projectId, userName, new Date().getTime())
     
     const response = {statusCode: 200, body: {result: true}};
     processAddLog(userId, 'create', event, response, response.statusCode, projectId)

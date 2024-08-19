@@ -22,6 +22,9 @@ const AUTH_REGION = "AWS_AUTH_REGION";
 const AUTH_API = "AWS_AUTH_API";
 const AUTH_STAGE = "test";
 
+const USER_PROFILES_API = "kew73ke7ggfstlawrfymxn62hi0jebct";
+const USER_PROFILES_SCANBYFIELD_PATH = "/scanbyfield";
+
 const ADMIN_METHODS = BACKEND_ADMIN_METHODS;
 const FIELDS = INPUT_FIELDS;
 const ENCRYPTED_FIELDS = INPUT_ENCRYPTED_FIELDS;
@@ -80,5 +83,7 @@ export {
     S3_BUCKET_NAME,
     kmsClient,
     EncryptCommand,
-    DecryptCommand
+    DecryptCommand,
+    USER_PROFILES_API,
+    USER_PROFILES_SCANBYFIELD_PATH
 };
