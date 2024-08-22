@@ -11,10 +11,12 @@ export const processUploadSearch = async (id, name, values, projectId, userName,
     var data = [];
     var cols = [];
     
-    let MODFIELDS = ['lastModifiedBy', 'lastModifiedTime'];
+    let MODFIELDS = [];
     MODFIELDS.push(...JSON.parse(JSON.stringify(FIELDS)));
     MODFIELDS.push("shortid");
     MODFIELDS.push("shortnumid");
+    MODFIELDS.push("lastModifiedBy");
+    MODFIELDS.push("lastModifiedTime");
     
     for(var i = 0; i < MODFIELDS.length; i++) {
       
