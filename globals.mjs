@@ -44,6 +44,8 @@ const ALLOW_DUPLICATE = CREATE_ALLOW_DUPLICATE;
 
 const PRESERVE_LOGS_DAYS = 3;
 
+const RANDOM_NUMBER_MAX_LIMIT = 5;
+
 export { 
     REGION,
     ScanCommand, 
@@ -85,5 +87,6 @@ export {
     EncryptCommand,
     DecryptCommand,
     USER_PROFILES_API,
-    USER_PROFILES_SCANBYFIELD_PATH
+    USER_PROFILES_SCANBYFIELD_PATH,
+    RANDOM_NUMBER_MAX_LIMIT
 };
