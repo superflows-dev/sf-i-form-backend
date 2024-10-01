@@ -37,7 +37,7 @@ export const processDelete = async (event) => {
         const email = hAscii.split(":")[0];
         const accessToken = hAscii.split(":")[1];
         
-        if(email == "" || !email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) {
+        if(email == "" || !email.match(/^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/)) {
             return {statusCode: 400, body: {result: false, error: "Malformed headers!"}}
         }
         
@@ -104,8 +104,7 @@ export const processDelete = async (event) => {
     }
 
     if(SEARCH_ENDPOINT.length > 1) {
-
-        const searchResult = await processSearchAllName(resultGet.Item[SEARCH_INDEX].substring(0,1000));
+        const searchResult = await processSearchAllName([resultGet.Item[SEARCH_INDEX].S.substring(0,1000).split('\\n')[0]]);
         
         if(searchResult.hits.found > parseInt(DELETE_SEARCH_THRESHOLD)) {
         
