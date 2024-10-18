@@ -44,7 +44,12 @@ export const processSearchName = async (searchString, cursor, size = 10) => {
       
       for(var i = 0; i < arrSearch.length; i++) {
         if(arrSearch[i] != "Select" && arrSearch[i].length > 0) {
-          query += '(' + arrSearch[i] + ")&";
+          // query += '(' + arrSearch[i] + ")&";
+          if(arrSearch[i].indexOf('(') >= 0 && arrSearch[i].indexOf(')') >= 0 ){
+            query += '(' + arrSearch[i] + ")&";
+          }else{
+            query += '"' + arrSearch[i] + "\"&";
+          }
           //query += "(or (prefix field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"') (phrase field=data '"+arrSearch[i].split(" ")[0].replace(/[^A-Za-z0-9]/g, "")+"')) "
         }
       }
@@ -61,7 +66,7 @@ export const processSearchName = async (searchString, cursor, size = 10) => {
       sort: 'data asc'
     };
     
-    console.log(params);
+    console.log('search params', params);
     
     const command = new SearchCommand(params);
     
