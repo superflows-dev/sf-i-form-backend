@@ -1,5 +1,5 @@
 import https from 'https';
-import { AUTH_REGION, AUTH_API, AUTH_STAGE, PutObjectCommand, s3Client, S3_BUCKET_NAME, GetObjectCommand, RANDOM_NUMBER_MAX_LIMIT } from "./globals.mjs";
+import { AUTH_REGION, AUTH_API, LAMBDA_KEY, AUTH_STAGE, PutObjectCommand, s3Client, S3_BUCKET_NAME, GetObjectCommand, RANDOM_NUMBER_MAX_LIMIT } from "./globals.mjs";
 
 export const processAuthenticate = async (authorization) => {
   
@@ -20,7 +20,8 @@ export const processAuthenticate = async (authorization) => {
        method: 'POST',
        path: '/validate',
        headers: {
-          'Authorization': authorization
+          'Authorization': authorization,
+          'x-lambda-key': LAMBDA_KEY
        }   
     };
     

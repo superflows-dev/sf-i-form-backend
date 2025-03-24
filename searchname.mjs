@@ -47,6 +47,8 @@ export const processSearchName = async (searchString, cursor, size = 10) => {
           // query += '(' + arrSearch[i] + ")&";
           if(arrSearch[i].indexOf('(') >= 0 && arrSearch[i].indexOf(')') >= 0 ){
             query += '(' + arrSearch[i] + ")&";
+          }else if(arrSearch[i].indexOf('|') >= 0){
+            query += arrSearch[i] + "&";
           }else{
             query += '"' + arrSearch[i] + "\"&";
           }

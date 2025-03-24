@@ -20,6 +20,7 @@ const LOG_GROUP_NAME = "AWS_LOG_GROUP_NAME";
 const AUTH_ENABLE = true;
 const AUTH_REGION = "AWS_AUTH_REGION";
 const AUTH_API = "AWS_AUTH_API";
+const LAMBDA_KEY = "AUTH_LAMBDA_KEY";
 const AUTH_STAGE = "test";
 
 const USER_PROFILES_API = "kew73ke7ggfstlawrfymxn62hi0jebct";
